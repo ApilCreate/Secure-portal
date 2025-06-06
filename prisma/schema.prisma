@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  username        String   @unique
+  email           String   @unique
+  password        String
+  passwordHistory String   @default("[]") // This is a JSON string now
+  isVerified      Boolean  @default(false)
+  loginAttempts   Int      @default(0)
+  lockedUntil     DateTime?
+  createdAt       DateTime @default(now())
+}
+
+
