@@ -1,15 +1,37 @@
-import prisma from "../../../lib/prisma";
-import bcrypt from "bcrypt";
+import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import axios from "axios";
 
 export async function POST(request) {
   try {
-    const { username, email, password } = await request.json();
+    const { username, email, password, captchaToken } = await request.json();
 
-    if (!username || !email || !password) {
-      return new Response(JSON.stringify({ error: "All fields are required." }), { status: 400 });
+    console.log("Received captchaToken on server:", captchaToken);
+
+    // ✅ 1. Check if CAPTCHA token is present
+    if (!captchaToken) {
+      return new Response(JSON.stringify({ error: "Captcha is required" }), { status: 400 });
     }
 
-    // Check if username or email already exists
+    // ✅ 2. Verify CAPTCHA with Google's API
+    const captchaRes = await axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      new URLSearchParams({
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: captchaToken,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    if (!captchaRes.data.success) {
+      return new Response(JSON.stringify({ error: "Captcha verification failed" }), { status: 400 });
+    }
+
+    // ✅ 3. Check for existing user (by username or email)
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [{ username }, { email }],
@@ -17,27 +39,27 @@ export async function POST(request) {
     });
 
     if (existingUser) {
-      return new Response(JSON.stringify({ error: "Username or email already exists." }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Username or email already exists" }), { status: 400 });
     }
 
-    // Hash the password
+    // ✅ 4. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save new user
+    // ✅ 5. Create new user
     const user = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
-        passwordHistory: JSON.stringify([hashedPassword]),
         isVerified: false,
       },
     });
 
+    // ✅ 6. Respond with success
     return new Response(JSON.stringify({ success: true, user }), { status: 201 });
 
   } catch (error) {
-    console.error("Register error:", error);
-    return new Response(JSON.stringify({ error: "Server error." }), { status: 500 });
+    console.error("Registration error:", error);
+    return new Response(JSON.stringify({ error: "Something went wrong." }), { status: 500 });
   }
 }

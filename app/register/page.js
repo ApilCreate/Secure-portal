@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,9 @@ export default function RegisterPage() {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
+
+console.log("CAPTCHA token sending to server:", captchaToken);
 
   // ✅ Password strength checker
   const getPasswordStrength = (password) => {
@@ -25,36 +29,50 @@ export default function RegisterPage() {
 
   const handleChange = (e) => {
     setFormData({
-      ...formData,
+      ...formData, 
       [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage('✅ Registration successful!');
-        setFormData({ username: '', email: '', password: '' });
-      } else {
-        setMessage(`❌ ${data.error || 'Registration failed'}`);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage('❌ Server error. Try again later.');
-    }
+  e.preventDefault();
+  setLoading(true);
+  setMessage('');
+
+  // ✅ Block form submission if CAPTCHA is missing
+  if (!captchaToken) {
+    setMessage("❌ Please complete the CAPTCHA.");
     setLoading(false);
-  };
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // ✅ Send captchaToken with the rest of the form
+      body: JSON.stringify({ ...formData, captchaToken }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setMessage('✅ Registration successful!');
+      setFormData({ username: '', email: '', password: '' });
+      setCaptchaToken(null); // clear captcha
+    } else {
+      setMessage(`❌ ${data.error || 'Registration failed'}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    setMessage('❌ Server error. Try again later.');
+  }
+
+  setLoading(false);
+};
+
 
   const passwordStrength = formData.password ? getPasswordStrength(formData.password) : null;
 
@@ -157,6 +175,12 @@ export default function RegisterPage() {
                 </div>
               )}
             </div>
+            <ReCAPTCHA
+  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+  onChange={(token) => setCaptchaToken(token)}
+  className="mt-3"
+/>
+
 
             {/* Submit Button */}
             <button

@@ -12,11 +12,24 @@ model User {
   username        String   @unique
   email           String   @unique
   password        String
-  passwordHistory String   @default("[]") // This is a JSON string now
   isVerified      Boolean  @default(false)
   loginAttempts   Int      @default(0)
   lockedUntil     DateTime?
   createdAt       DateTime @default(now())
+
+  twoFactorSecret String?           // for Google Authenticator secret
+  isTwoFactorEnabled Boolean        @default(false)
+  
+  passwordHistory PasswordHistory[]
+}
+
+model PasswordHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  hash      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 
