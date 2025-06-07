@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
 
-console.log("CAPTCHA token sending to server:", captchaToken);
+  console.log("CAPTCHA token sending to server:", captchaToken);
 
   // ✅ Password strength checker
   const getPasswordStrength = (password) => {
@@ -21,10 +21,10 @@ console.log("CAPTCHA token sending to server:", captchaToken);
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
-    if (strength <= 1) return { label: 'Weak', color: 'text-red-500', bg: 'bg-red-500', width: '25%' };
-    if (strength === 2) return { label: 'Fair', color: 'text-orange-500', bg: 'bg-orange-500', width: '50%' };
-    if (strength === 3) return { label: 'Good', color: 'text-yellow-500', bg: 'bg-yellow-500', width: '75%' };
-    if (strength === 4) return { label: 'Strong', color: 'text-green-500', bg: 'bg-green-500', width: '100%' };
+    if (strength <= 1) return { label: 'Weak', color: 'text-red-400', bg: 'bg-red-500', width: '25%' };
+    if (strength === 2) return { label: 'Fair', color: 'text-orange-400', bg: 'bg-orange-500', width: '50%' };
+    if (strength === 3) return { label: 'Good', color: 'text-yellow-400', bg: 'bg-yellow-500', width: '75%' };
+    if (strength === 4) return { label: 'Strong', color: 'text-green-400', bg: 'bg-green-500', width: '100%' };
   };
 
   const handleChange = (e) => {
@@ -35,138 +35,137 @@ console.log("CAPTCHA token sending to server:", captchaToken);
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setMessage('');
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
 
-  // ✅ Block form submission if CAPTCHA is missing
-  if (!captchaToken) {
-    setMessage("❌ Please complete the CAPTCHA.");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // ✅ Send captchaToken with the rest of the form
-      body: JSON.stringify({ ...formData, captchaToken }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage('✅ Registration successful!');
-      setFormData({ username: '', email: '', password: '' });
-      setCaptchaToken(null); // clear captcha
-    } else {
-      setMessage(`❌ ${data.error || 'Registration failed'}`);
+    // ✅ Block form submission if CAPTCHA is missing
+    if (!captchaToken) {
+      setMessage("❌ Please complete the CAPTCHA.");
+      setLoading(false);
+      return;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    setMessage('❌ Server error. Try again later.');
-  }
 
-  setLoading(false);
-};
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // ✅ Send captchaToken with the rest of the form
+        body: JSON.stringify({ ...formData, captchaToken }),
+      });
 
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage('✅ Registration successful!');
+        setFormData({ username: '', email: '', password: '' });
+        setCaptchaToken(null); // clear captcha
+      } else {
+        setMessage(`❌ ${data.error || 'Registration failed'}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('❌ Server error. Try again later.');
+    }
+
+    setLoading(false);
+  };
 
   const passwordStrength = formData.password ? getPasswordStrength(formData.password) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-75"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-br from-green-400 to-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-150"></div>
-      </div>
+    <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex items-center justify-center p-4">
+      {/* Background pattern */}
+      <div className="absolute inset-0 "></div>
 
       <div className="relative w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 sm:p-10 space-y-8 transform hover:scale-[1.02] transition-all duration-300">
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Create Your Account
-            </h1>
-            <p className="text-gray-600 text-sm">Join thousands of users worldwide</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 rounded-xl mb-6">
+            <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+          <p className="text-gray-400 text-sm">Enter your details to get started</p>
+        </div>
 
-          {/* Form */}
+        {/* Form Card */}
+        <div className="bg-zinc-900 p-8 rounded-2xl shadow-2xl">
           <div className="space-y-6">
             {/* Username Field */}
-            <div className="group relative">
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className="w-full px-4 py-4 text-gray-900 placeholder-gray-500 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 group-hover:bg-gray-50 focus:bg-white focus:shadow-lg"
-                required
-              />
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                <svg className="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+            <div>
+              <label className="block text-white text-sm font-medium mb-2">Username</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  required
+                />
               </div>
             </div>
 
             {/* Email Field */}
-            <div className="group relative">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                className="w-full px-4 py-4 text-gray-900 placeholder-gray-500 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 group-hover:bg-gray-50 focus:bg-white focus:shadow-lg"
-                required
-              />
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                <svg className="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                </svg>
+            <div>
+              <label className="block text-white text-sm font-medium mb-2">Email Address</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  required
+                />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="space-y-3">
-              <div className="group relative">
+            <div>
+              <label className="block text-white text-sm font-medium mb-2">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Password"
-                  className="w-full px-4 py-4 text-gray-900 placeholder-gray-500 bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 group-hover:bg-gray-50 focus:bg-white focus:shadow-lg"
+                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
                   required
                 />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                  <svg className="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
               </div>
-
               {/* Password Strength Indicator */}
               {passwordStrength && (
-                <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                <div className="space-y-2 mt-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-700">Password Strength</span>
+                    <span className="text-xs font-medium text-gray-400">Password Strength</span>
                     <span className={`text-xs font-semibold ${passwordStrength.color}`}>
                       {passwordStrength.label}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div 
                       className={`h-full ${passwordStrength.bg} transition-all duration-500 ease-out rounded-full`}
                       style={{ width: passwordStrength.width }}
@@ -175,54 +174,63 @@ console.log("CAPTCHA token sending to server:", captchaToken);
                 </div>
               )}
             </div>
-            <ReCAPTCHA
-  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-  onChange={(token) => setCaptchaToken(token)}
-  className="mt-3"
-/>
 
+            {/* reCAPTCHA */}
+            <div className="flex justify-center py-2">
+              <ReCAPTCHA
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+                theme="dark"
+              />
+            </div>
 
             {/* Submit Button */}
             <button
-              type="submit"
-              disabled={loading}
               onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl disabled:scale-100 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 relative overflow-hidden"
+              disabled={loading}
+              className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-2"
             >
               {loading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Registering...</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                  <span>Creating Account...</span>
                 </div>
               ) : (
-                <span className="flex items-center justify-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <span>Create Account</span>
-                  <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </span>
+                </div>
               )}
             </button>
+
+            {/* Back to Sign In */}
+            <div className="text-center mt-2">
+              <button className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+                Back to Sign In
+              </button>
+            </div>
           </div>
 
           {/* Message */}
           {message && (
-            <div className={`mt-6 p-4 rounded-2xl text-center text-sm font-medium animate-in slide-in-from-bottom-2 duration-300 ${
-              message.includes('✅') 
-                ? 'bg-green-50 text-green-700 border border-green-200' 
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
-              {message}
+            <div className="mt-6 p-4 bg-gray-800 rounded-lg">
+              <p className={`text-center text-sm font-medium ${
+                message.includes('✅') ? 'text-green-400' : 'text-red-400'
+              }`}>
+                {message}
+              </p>
             </div>
           )}
+        </div>
 
-          {/* Footer */}
-          <div className="text-center text-sm text-gray-600 border-t border-gray-100 pt-6">
-            Already have an account?{' '}
-            <button className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
-              Sign in
-            </button>
-          </div>
+        {/* Security Note */}
+        <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
+          <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+          </svg>
+          <span>Your information is secure and encrypted</span>
         </div>
       </div>
     </div>
