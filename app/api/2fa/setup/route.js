@@ -7,15 +7,18 @@ export async function POST(request) {
     const { userId } = await request.json();
 
     if (!userId) {
-      return new Response(JSON.stringify({ error: "Missing user ID." }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "Missing user ID." }),
+        { status: 400 }
+      );
     }
 
-    // Generate TOTP secret
+    // Generate a new TOTP secret
     const secret = speakeasy.generateSecret({
-      name: `SecurePortal (${userId})`, // shows up in Google Auth app
+      name: `SecurePortal`, // 👈 App name shown in Google Authenticator
     });
 
-    // Save secret to user's record
+    // Save secret to the user's record in the database
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -23,15 +26,19 @@ export async function POST(request) {
       },
     });
 
-    // Convert secret to QR code
+    // Generate a QR code from the secret
     const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
 
-    return new Response(JSON.stringify({ qr: qrCodeDataURL }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ qr: qrCodeDataURL }),
+      { status: 200 }
+    );
 
   } catch (error) {
-    console.error("2FA setup error:", error);
-    return new Response(JSON.stringify({ error: "Server error." }), { status: 500 });
+    console.error("❌ 2FA Setup Error:", error);
+    return new Response(
+      JSON.stringify({ error: "Server error while generating QR code." }),
+      { status: 500 }
+    );
   }
 }

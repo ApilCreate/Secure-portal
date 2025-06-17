@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "otp" TEXT;
+ALTER TABLE "User" ADD COLUMN "otpExpiry" DATETIME;
+ALTER TABLE "User" ADD COLUMN "tokenExpiry" DATETIME;
+ALTER TABLE "User" ADD COLUMN "verifyToken" TEXT;

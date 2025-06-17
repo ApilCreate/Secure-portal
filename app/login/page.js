@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ user: '', password: '', token: '' });
-  const [step, setStep] = useState(1); // 1 = login, 2 = 2FA
+  const [step, setStep] = useState(1);
   const [userId, setUserId] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -18,39 +18,42 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
-
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: formData.user, password: formData.password }),
       });
-
       const data = await res.json();
 
       if (res.ok) {
-        if (data.requires2FA) {
+        if (data.twoFactorRequired) {
           setUserId(data.userId);
           setStep(2);
+          toast('2FA required', { icon: '🔐' });
         } else {
-          setMessage('✅ Login successful!');
-          setTimeout(() => router.push('/account'), 1000);
+          // ✅ Save full user with 2FA flag
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify({
+            id: data.user.id,
+            username: data.user.username,
+            email: data.user.email,
+            isTwoFactorEnabled: data.user.isTwoFactorEnabled, // ✅ Include this!
+          }));
+          toast.success('Login successful!');
+          setTimeout(() => router.push('/account'), 1200);
         }
       } else {
-        setMessage(`❌ ${data.error}`);
+        toast.error(data.error || 'Login failed');
       }
     } catch (err) {
-      setMessage('❌ Server error. Try again later.');
+      toast.error('Server error. Try again later.');
     }
-
     setLoading(false);
   };
 
   const handle2FAVerify = async () => {
     setLoading(true);
-    setMessage('');
-
     try {
       const res = await fetch('/api/2fa/verify', {
         method: 'POST',
@@ -59,22 +62,30 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        setMessage('✅ 2FA verified. Logging in...');
-        setTimeout(() => router.push('/account'), 1000);
+        // ✅ Save full user with 2FA flag
+        localStorage.setItem("user", JSON.stringify({
+          id: data.user.id,
+          username: data.user.username,
+          email: data.user.email,
+          isTwoFactorEnabled: data.user.isTwoFactorEnabled, // ✅ Include this!
+        }));
+        localStorage.setItem("token", data.token);
+        toast.success('2FA verified. Logging in...');
+        setTimeout(() => router.push('/account'), 1200);
       } else {
-        setMessage(`❌ ${data.error}`);
+        toast.error(data.error || 'Verification failed');
       }
     } catch (err) {
-      setMessage('❌ Server error during 2FA.');
+      toast.error('Server error during 2FA.');
     }
-
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex items-center justify-center p-4">
-      
+      <Toaster position="top-center" />
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
@@ -91,40 +102,30 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Form Container */}
         <div className="bg-zinc-900 p-8 rounded-2xl shadow-2xl">
           {step === 1 ? (
-            <div className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-5">
                 <div>
                   <label htmlFor="user" className="block text-sm font-medium text-white mb-2">
                     Username or Email
                   </label>
-                  <div className="relative">
-                    <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                    <input
-                      id="user"
-                      type="text"
-                      name="user"
-                      placeholder="Username or Email"
-                      value={formData.user}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
-                    />
-                  </div>
+                  <input
+                    id="user"
+                    type="text"
+                    name="user"
+                    placeholder="Username or Email"
+                    value={formData.user}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-4 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-transparent"
+                  />
                 </div>
-
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                     Password
                   </label>
                   <div className="relative">
-                    <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M18,8h-1V6c0-2.76-2.24-5-5-5S7,3.24,7,6v2H6c-1.1,0-2,0.9-2,2v10c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2V10C20,8.9,19.1,8,18,8z M12,17c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S13.1,17,12,17z M15.1,8H8.9V6c0-1.71,1.39-3.1,3.1-3.1c1.71,0,3.1,1.39,3.1,3.1V8z"/>
-                    </svg>
                     <input
                       id="password"
                       type="password"
@@ -133,100 +134,62 @@ export default function LoginPage() {
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                      className="w-full pl-4 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-transparent"
                     />
                   </div>
                 </div>
               </div>
-
               <button
                 type="submit"
                 disabled={loading}
-                onClick={handleLogin}
-                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
               >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                    <span>Signing in...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <span>Sign In</span>
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/>
-                    </svg>
-                  </div>
-                )}
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
-            </div>
+            </form>
           ) : (
             <div className="space-y-6">
               <div>
                 <label htmlFor="token" className="block text-sm font-medium text-white mb-2">
                   Authentication Code
                 </label>
-                <div className="relative">
-                  <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
-                  </svg>
-                  <input
-                    id="token"
-                    type="text"
-                    name="token"
-                    placeholder="Enter 6-digit code"
-                    value={formData.token}
-                    onChange={handleChange}
-                    required
-                    className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200 text-center text-xl tracking-widest font-mono"
-                  />
-                </div>
+                <input
+                  id="token"
+                  type="text"
+                  name="token"
+                  placeholder="Enter 6-digit code"
+                  value={formData.token}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                />
               </div>
-              
               <button
                 onClick={handle2FAVerify}
                 disabled={loading}
-                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
               >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                    <span>Verifying...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <span>Verify Code</span>
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/>
-                    </svg>
-                  </div>
-                )}
+                {loading ? 'Verifying...' : 'Verify Code'}
               </button>
             </div>
           )}
 
           <div className="text-center mt-6">
-            <a 
-              href="/forgot-password" 
-              className="text-slate-400 hover:text-lime-400 text-sm transition-colors duration-200 hover:underline underline-offset-4"
-            >
+            <a href="/forgot-password" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
               Forgot your password?
             </a>
           </div>
-
-          {message && (
-            <div className="mt-6 p-4 bg-zinc-800 border border-zinc-700 rounded-xl">
-              <p className="text-center text-sm font-medium text-white">
-                {message}
-              </p>
-            </div>
-          )}
+          <div className="text-center mt-4">
+            <a href="/register" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+              No account? Sign up
+            </a>
+          </div>
         </div>
 
         {/* Security Note */}
         <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
           <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
           </svg>
           <span>Your information is secure and encrypted</span>
         </div>

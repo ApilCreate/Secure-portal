@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function RegisterPage() {
@@ -11,6 +12,10 @@ export default function RegisterPage() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+
 
   console.log("CAPTCHA token sending to server:", captchaToken);
 
@@ -29,19 +34,99 @@ export default function RegisterPage() {
 
   const handleChange = (e) => {
     setFormData({
-      ...formData, 
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
+
+  const verifyOtp = async () => {
+    if (!otp) {
+      setMessage("❌ Please enter the OTP.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("✅ OTP verified. You can now complete registration.");
+        setEmailVerified(true);
+      } else {
+        toast.error(`❌ ${data.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Verification failed.");
+    }
+  };
+
+const handleResendOtp = async () => {
+  try {
+    const res = await fetch('/api/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: formData.email }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("✅ OTP resent to your email.");
+    } else {
+      toast.error(`❌ ${data.error}`);
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("❌ Failed to resend OTP.");
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
 
-    // ✅ Block form submission if CAPTCHA is missing
     if (!captchaToken) {
       setMessage("❌ Please complete the CAPTCHA.");
+      setLoading(false);
+      return;
+    }
+
+    if (!isOtpSent) {
+      try {
+        const res = await fetch('/api/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          toast.success("✅ OTP sent to your email.");
+          setIsOtpSent(true);
+        } else {
+          setMessage(`❌ ${data.error}`);
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage("❌ Failed to send OTP.");
+      }
+
+      setLoading(false);
+      return; // Wait for OTP to be entered
+    }
+
+    if (!emailVerified) {
+      setMessage("❌ Please verify the OTP sent to your email.");
       setLoading(false);
       return;
     }
@@ -52,7 +137,6 @@ export default function RegisterPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // ✅ Send captchaToken with the rest of the form
         body: JSON.stringify({ ...formData, captchaToken }),
       });
 
@@ -61,7 +145,10 @@ export default function RegisterPage() {
       if (res.ok) {
         setMessage('✅ Registration successful!');
         setFormData({ username: '', email: '', password: '' });
-        setCaptchaToken(null); // clear captcha
+        setCaptchaToken(null);
+        setOtp('');
+        setIsOtpSent(false);
+        setEmailVerified(false);
       } else {
         setMessage(`❌ ${data.error || 'Registration failed'}`);
       }
@@ -73,12 +160,15 @@ export default function RegisterPage() {
     setLoading(false);
   };
 
+
   const passwordStrength = formData.password ? getPasswordStrength(formData.password) : null;
 
   return (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex items-center justify-center p-4">
       {/* Background pattern */}
       <div className="absolute inset-0 "></div>
+      <Toaster position="top-center" />
+
 
       <div className="relative w-full max-w-md">
         {/* Header */}
@@ -135,6 +225,9 @@ export default function RegisterPage() {
                   required
                 />
               </div>
+
+              
+
             </div>
 
             {/* Password Field */}
@@ -166,7 +259,7 @@ export default function RegisterPage() {
                     </span>
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
+                    <div
                       className={`h-full ${passwordStrength.bg} transition-all duration-500 ease-out rounded-full`}
                       style={{ width: passwordStrength.width }}
                     ></div>
@@ -174,6 +267,38 @@ export default function RegisterPage() {
                 </div>
               )}
             </div>
+            {isOtpSent && !emailVerified && (
+  <div className="mt-4 space-y-2">
+    <label className="block text-white text-sm font-medium">Enter OTP</label>
+    <input
+      type="text"
+      value={otp}
+      onChange={(e) => setOtp(e.target.value)}
+      placeholder="6-digit code"
+      className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white"
+    />
+
+    {/* Verify + Resend Buttons side by side */}
+    <div className="flex gap-4 mt-3">
+      <button
+        type="button"
+        onClick={verifyOtp}
+        className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3 rounded-lg text-sm transition-colors duration-200"
+      >
+        Verify OTP
+      </button>
+      <button
+        type="button"
+        onClick={handleResendOtp}
+        className="w-full py-3 bg-transparent border-lime-400 border-2 text-lime-400 hover:bg-lime-500 hover:text-black font-semibold rounded-lg text-sm transition-colors duration-200"
+      >
+        Resend OTP
+      </button>
+    </div>
+  </div>
+)}
+
+
 
             {/* reCAPTCHA */}
             <div className="flex justify-center py-2">
@@ -207,18 +332,17 @@ export default function RegisterPage() {
 
             {/* Back to Sign In */}
             <div className="text-center mt-2">
-              <button className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
-                Back to Sign In
-              </button>
+              <a href='/login' className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+                Already have a account? Sign In
+              </a>
             </div>
           </div>
 
           {/* Message */}
           {message && (
             <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-              <p className={`text-center text-sm font-medium ${
-                message.includes('✅') ? 'text-green-400' : 'text-red-400'
-              }`}>
+              <p className={`text-center text-sm font-medium ${message.includes('✅') ? 'text-green-400' : 'text-red-400'
+                }`}>
                 {message}
               </p>
             </div>
@@ -228,7 +352,7 @@ export default function RegisterPage() {
         {/* Security Note */}
         <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
           <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
           </svg>
           <span>Your information is secure and encrypted</span>
         </div>

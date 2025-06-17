@@ -8,20 +8,24 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())
-  username        String   @unique
-  email           String   @unique
-  password        String
-  isVerified      Boolean  @default(false)
-  loginAttempts   Int      @default(0)
-  lockedUntil     DateTime?
-  createdAt       DateTime @default(now())
+  id                 String   @id @default(uuid())
+  username           String   @unique
+  email              String   @unique
+  password           String
+  isVerified         Boolean  @default(false)
+  verifyToken        String?               // ✅ for email verification
+  tokenExpiry        DateTime?             // ✅ token expiration
+  otp                String?              // ✅ OTP for verification
+  otpExpiry          DateTime?            // ✅ Expiry time for OTP
+  loginAttempts      Int      @default(0)
+  lockedUntil        DateTime?
+  createdAt          DateTime @default(now())
+  twoFactorSecret    String?               // TOTP secret (optional)
+  isTwoFactorEnabled Boolean  @default(false)
 
-  twoFactorSecret String?           // for Google Authenticator secret
-  isTwoFactorEnabled Boolean        @default(false)
-  
   passwordHistory PasswordHistory[]
 }
+
 
 model PasswordHistory {
   id        String   @id @default(uuid())

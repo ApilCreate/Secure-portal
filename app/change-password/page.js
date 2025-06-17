@@ -1,0 +1,177 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import toast, { Toaster } from 'react-hot-toast';
+
+export default function ChangePasswordPage() {
+  const router = useRouter();
+  const [userId, setUserId] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [show2FA, setShow2FA] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser || storedUser === 'undefined') return;
+
+    try {
+      const parsed = JSON.parse(storedUser);
+      console.log("User loaded from storage:", parsed);
+
+      if (parsed?.id) setUserId(parsed.id);
+
+      if (parsed?.isTwoFactorEnabled) {
+        setShow2FA(true);
+      } else {
+        setShow2FA(false);
+      }
+    } catch (err) {
+      console.error('Failed to parse user from localStorage:', err);
+    }
+  }, []);
+
+  const getPasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    if (strength <= 1) return { label: 'Weak', color: 'text-red-400', bg: 'bg-red-500', width: '25%' };
+    if (strength === 2) return { label: 'Fair', color: 'text-orange-400', bg: 'bg-orange-500', width: '50%' };
+    if (strength === 3) return { label: 'Good', color: 'text-yellow-400', bg: 'bg-yellow-500', width: '75%' };
+    if (strength === 4) return { label: 'Strong', color: 'text-green-400', bg: 'bg-green-500', width: '100%' };
+  };
+
+  const passwordStrength = newPassword ? getPasswordStrength(newPassword) : null;
+  const passwordsMatch = newPassword && confirmPassword && newPassword === confirmPassword;
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword || !userId) {
+      return toast.error('Please fill in all fields');
+    }
+    if (newPassword === currentPassword) {
+      return toast.error('New password cannot be the same as the current password');
+    }
+    if (!passwordsMatch) {
+      return toast.error('Passwords do not match');
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, currentPassword, newPassword, token: show2FA ? token : undefined }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Password changed successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setToken('');
+        setTimeout(() => router.push('/account'), 1000);
+      } else {
+        toast.error(data.error || 'Password change failed');
+      }
+    } catch (err) {
+      toast.error('Server error. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex flex-col items-center justify-center p-6">
+      <Toaster position="top-center" />
+
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-400 rounded-3xl mb-6">
+          <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-semibold text-white mb-2">Change Password</h1>
+        <p className="text-slate-400">Secure your account with a new password</p>
+      </div>
+
+      <form onSubmit={handleChangePassword} className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6">
+        <input
+          type="password"
+          placeholder="Current Password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          required
+          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+        />
+
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+        />
+
+        {passwordStrength && (
+          <div className="text-xs text-white">
+            <div className="mb-1 flex justify-between">
+              <span>Password Strength</span>
+              <span className={passwordStrength.color}>{passwordStrength.label}</span>
+            </div>
+            <div className="w-full h-2 bg-gray-700 rounded-full">
+              <div className={`${passwordStrength.bg} h-full rounded-full`} style={{ width: passwordStrength.width }}></div>
+            </div>
+          </div>
+        )}
+
+        <input
+          type="password"
+          placeholder="Confirm New Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+        />
+
+        {confirmPassword && (
+          <p className={`text-sm ${passwordsMatch ? 'text-green-400' : 'text-red-400'}`}>
+            {passwordsMatch ? '✅ Passwords match' : '❌ Passwords do not match'}
+          </p>
+        )}
+
+        {show2FA && (
+          <input
+            type="text"
+            placeholder="2FA Code"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+          />
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-lime-500 hover:bg-lime-400 text-black font-semibold py-3 rounded-xl transition duration-300"
+        >
+          {loading ? 'Updating...' : 'Change Password'}
+        </button>
+      </form>
+
+      <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
+        <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
+        </svg>
+        <span>Your information is secure and encrypted</span>
+      </div>
+    </div>
+  );
+}
