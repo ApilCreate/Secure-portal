@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { logActivity } from '@/lib/logActivity';
 
 export async function POST(request) {
   try {
@@ -54,25 +55,27 @@ export async function POST(request) {
       },
     });
 
-    // ✅ If 2FA is enabled, require code
+    // ✅ If 2FA is enabled, require code first
     if (existingUser.isTwoFactorEnabled && existingUser.twoFactorSecret) {
-  return new Response(
-    JSON.stringify({
-      twoFactorRequired: true,
-      userId: existingUser.id,
-      user: {
-        id: existingUser.id,
-        email: existingUser.email,
-        username: existingUser.username,
-        isTwoFactorEnabled: existingUser.isTwoFactorEnabled, // ✅ Include this
-      },
-    }),
-    { status: 200 }
-  );
-}
+      return new Response(
+        JSON.stringify({
+          twoFactorRequired: true,
+          userId: existingUser.id,
+          user: {
+            id: existingUser.id,
+            email: existingUser.email,
+            username: existingUser.username,
+            isTwoFactorEnabled: existingUser.isTwoFactorEnabled,
+          },
+        }),
+        { status: 200 }
+      );
+    }
 
+    // ✅ Log the successful login activity
+    await logActivity(existingUser.id, 'Login');
 
-    // ✅ Return user object with 2FA info included
+    // ✅ Return user data
     return new Response(
       JSON.stringify({
         success: true,
@@ -81,7 +84,7 @@ export async function POST(request) {
           id: existingUser.id,
           email: existingUser.email,
           username: existingUser.username,
-          isTwoFactorEnabled: existingUser.isTwoFactorEnabled  // ✅ ADD THIS
+          isTwoFactorEnabled: existingUser.isTwoFactorEnabled,
         },
       }),
       { status: 200 }

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import speakeasy from "speakeasy";
+import { logActivity } from "@/lib/logActivity"; // ✅ Import logActivity
 
 export async function POST(request) {
   try {
@@ -62,6 +63,9 @@ export async function POST(request) {
         where: { id: userId },
         data: { isTwoFactorEnabled: true },
       });
+
+      // ✅ Log activity
+      await logActivity(userId, 'Enabled 2FA');
     }
 
     // ✅ Return safe user info including 2FA flag

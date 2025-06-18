@@ -148,6 +148,12 @@ export default function AccountPage() {
 
         {/* Action Buttons */}
         <div className="space-y-4">
+          <a href='/activity-log'
+            className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"
+          >
+            Activity Status
+          </a>
+
           <a
             href="/change-password"
             className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"

@@ -8,24 +8,24 @@ datasource db {
 }
 
 model User {
-  id                 String   @id @default(uuid())
-  username           String   @unique
-  email              String   @unique
+  id                 String    @id @default(uuid())
+  username           String    @unique
+  email              String    @unique
   password           String
-  isVerified         Boolean  @default(false)
-  verifyToken        String?               // ✅ for email verification
-  tokenExpiry        DateTime?             // ✅ token expiration
-  otp                String?              // ✅ OTP for verification
-  otpExpiry          DateTime?            // ✅ Expiry time for OTP
-  loginAttempts      Int      @default(0)
+  isVerified         Boolean   @default(false)
+  verifyToken        String? // ✅ for email verification
+  tokenExpiry        DateTime? // ✅ token expiration
+  otp                String? // ✅ OTP for verification
+  otpExpiry          DateTime? // ✅ Expiry time for OTP
+  loginAttempts      Int       @default(0)
   lockedUntil        DateTime?
-  createdAt          DateTime @default(now())
-  twoFactorSecret    String?               // TOTP secret (optional)
-  isTwoFactorEnabled Boolean  @default(false)
+  createdAt          DateTime  @default(now())
+  twoFactorSecret    String? // TOTP secret (optional)
+  isTwoFactorEnabled Boolean   @default(false)
 
   passwordHistory PasswordHistory[]
+  activityLogs    ActivityLog[] // ✅ Added reverse relation
 }
-
 
 model PasswordHistory {
   id        String   @id @default(uuid())
@@ -36,4 +36,10 @@ model PasswordHistory {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
+model ActivityLog {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  action    String // e.g., "Login", "Logout", "2FA Enabled", etc.
+  timestamp DateTime @default(now())
+}

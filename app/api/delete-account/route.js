@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import speakeasy from 'speakeasy';
+import { logActivity } from '@/lib/logActivity'; // ✅ Import logActivity
 
 export async function POST(request) {
   try {
@@ -38,13 +39,16 @@ export async function POST(request) {
         secret: user.twoFactorSecret,
         encoding: 'base32',
         token,
-        window: 1, // Accept ±30s window
+        window: 1,
       });
 
       if (!isValid) {
         return new Response(JSON.stringify({ error: "Invalid 2FA code" }), { status: 401 });
       }
     }
+
+    // ✅ Log activity BEFORE deletion
+    await logActivity(userId, 'Deleted Account');
 
     // 🧹 Delete user
     await prisma.user.delete({

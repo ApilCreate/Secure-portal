@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import speakeasy from 'speakeasy';
 import zxcvbn from 'zxcvbn';
+import { logActivity } from '@/lib/logActivity'; // ✅ Import logActivity
 
 export async function POST(request) {
     try {
@@ -11,7 +12,6 @@ export async function POST(request) {
         if (!userId) return new Response(JSON.stringify({ error: 'Missing userId' }), { status: 400 });
         if (!currentPassword) return new Response(JSON.stringify({ error: 'Missing current password' }), { status: 400 });
         if (!newPassword) return new Response(JSON.stringify({ error: 'Missing new password' }), { status: 400 });
-
 
         // ✅ Find the user
         const user = await prisma.user.findUnique({
@@ -34,10 +34,8 @@ export async function POST(request) {
             return new Response(JSON.stringify({ error: 'New password must be different from the current one.' }), { status: 400 });
         }
 
-        // Optional: Log strength or give user feedback, but don’t block them
+        // Optional: Log strength or give user feedback
         const strength = zxcvbn(newPassword);
-        // You can log it or add analytics here if needed
-
 
         // ✅ If 2FA is enabled, verify TOTP token
         if (user.isTwoFactorEnabled) {
@@ -67,6 +65,9 @@ export async function POST(request) {
                 lockedUntil: null,
             },
         });
+
+        // ✅ Log the activity
+        await logActivity(userId, 'Changed Password');
 
         return new Response(JSON.stringify({ success: true }), { status: 200 });
 

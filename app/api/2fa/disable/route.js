@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { logActivity } from '@/lib/logActivity'; // ✅ Import logActivity
 
 export async function POST(request) {
   try {
@@ -38,10 +39,18 @@ export async function POST(request) {
         twoFactorSecret: null,
       },
     });
+    // ✅ Log the activity
+console.log('🔥 Calling logActivity...');
+await logActivity(userId, 'Disabled 2FA');
+console.log('✅ logActivity call finished');
+
+    // ✅ Log the activity
+    await logActivity(userId, 'Disabled 2FA');
 
     return new Response(JSON.stringify({ success: true, message: '2FA disabled successfully.' }), { status: 200 });
   } catch (error) {
     console.error('Disable 2FA error:', error);
     return new Response(JSON.stringify({ error: 'Server error while disabling 2FA.' }), { status: 500 });
   }
+  
 }
