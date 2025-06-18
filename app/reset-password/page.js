@@ -1,13 +1,17 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get('token');
+  const redirectTo = searchParams.get('redirect') || '/login';
+
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const getPasswordStrength = (password) => {
@@ -27,17 +31,16 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
     setLoading(true);
 
     if (!token) {
-      setMessage('❌ Invalid or missing token.');
+      toast.error('Invalid or missing token.');
       setLoading(false);
       return;
     }
 
     if (password !== confirm) {
-      setMessage('❌ Passwords do not match.');
+      toast.error('Passwords do not match.');
       setLoading(false);
       return;
     }
@@ -52,14 +55,13 @@ export default function ResetPasswordPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage('✅ Password reset successful! You may now log in.');
-        setPassword('');
-        setConfirm('');
+        toast.success('✅ Password reset successful! Redirecting...');
+        setTimeout(() => router.push(redirectTo), 2000);
       } else {
-        setMessage(`❌ ${data.error}`);
+        toast.error(data.error || 'Reset failed');
       }
     } catch (error) {
-      setMessage('❌ Server error. Try again later.');
+      toast.error('Server error. Try again later.');
     }
 
     setLoading(false);
@@ -67,6 +69,8 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex flex-col items-center justify-center p-4 space-y-8">
+      <Toaster position="top-center" />
+      
       {/* Header Section */}
       <div className="text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 rounded-2xl mb-4 shadow-lg">
@@ -125,23 +129,22 @@ export default function ResetPasswordPage() {
             {loading ? 'Updating...' : 'Reset Password'}
           </button>
 
-          {message && (
-            <p className={`text-center text-sm mt-4 ${message.includes('✅') ? 'text-green-400' : 'text-red-400'}`}>{message}</p>
-          )}
-
           <p className="text-center text-sm text-gray-400 mt-6">
             Remember your password?{' '}
-            <button className="text-lime-400 hover:underline">Back to Login</button>
+            <button type="button" onClick={() => router.push('/login')} className="text-lime-400 hover:underline">
+              Back to Login
+            </button>
           </p>
         </form>
       </div>
+
       {/* Security Note */}
-        <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
-          <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
-          </svg>
-          <span>Your information is secure and encrypted</span>
-        </div>
+      <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
+        <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+        </svg>
+        <span>Your information is secure and encrypted</span>
+      </div>
     </div>
   );
 }

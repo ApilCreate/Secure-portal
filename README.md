@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Secure Auth Portal (Next.js + Prisma + 2FA + OTP + CAPTCHA)
+
+This is a secure authentication portal built using Next.js, Prisma, Tailwind CSS, and SQLite. The application includes:
+
+- OTP-based email verification during registration
+- Optional Two-Factor Authentication (2FA)
+- Google reCAPTCHA to prevent bots
+- Password strength meter
+- Activity log for user actions (login, logout, password changes, 2FA updates)
+- Account lockout protection after failed login attempts
+- Secure password handling with bcrypt encryption
+- Animated dark-themed UI with glassmorphism design
+- Responsive mobile-friendly layout
+
+## Features
+
+- Registration with email verification (OTP)
+- Login with optional 2FA verification
+- Forgot password and reset functionality
+- Password strength indicator
+- CAPTCHA validation using Google reCAPTCHA v2
+- Account deletion with 2FA check (if enabled)
+- View and manage activity logs
+- Toggle password visibility
+- Feedback via toast messages instead of labels
+
+## Technologies Used
+
+- **Frontend:** Next.js 14 (App Router), React, Tailwind CSS
+- **Backend:** Node.js, Prisma ORM, SQLite (can be changed)
+- **Security:** bcrypt, OTP, 2FA (TOTP), CAPTCHA
+- **Email:** Nodemailer (Gmail SMTP)
+- **Icons:** Lucide React
+- **Notifications:** react-hot-toast
 
 ## Getting Started
 
-First, run the development server:
+### 1. Running the project
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+i. Type cd secure-portal
+ii. After that typenpm run dev
+iii.  Click on  - Local: http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## NPM Packages Used
 
-## Learn More
+# Runtime & Framework
+npm install next react react-dom
 
-To learn more about Next.js, take a look at the following resources:
+# Styling & UI
+npm install tailwindcss postcss autoprefixer
+npm install lucide-react
+npm install react-hot-toast
+npm install react-google-recaptcha
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Database & ORM
+npm install @prisma/client
+npm install prisma --save-dev
+npm install sqlite3
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Authentication & Security
+npm install bcryptjs
+npm install speakeasy
+npm install nodemailer
+npm install date-fns
+npm install qrcode
 
-## Deploy on Vercel
+## NPX Commands Used
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Initialize Prisma
+npx prisma init
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Apply Prisma migration
+npx prisma migrate dev --name init
+
+# Generate Prisma client
+npx prisma generate

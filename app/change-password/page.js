@@ -90,6 +90,16 @@ export default function ChangePasswordPage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex flex-col items-center justify-center p-6">
       <Toaster position="top-center" />
+      {/* Enhanced Back Button */}
+      <button
+        onClick={() => router.push('/account')}
+        className="absolute top-6 left-6 group flex items-center gap-2 text-sm text-white/90 bg-black/30 backdrop-blur-md border border-lime-500/30 px-5 py-3 rounded-2xl hover:bg-lime-500/10 hover:border-lime-400 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-lime-500/20"
+      >
+        <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Dashboard
+      </button>
 
       <div className="text-center mb-10">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-400 rounded-3xl mb-6">
@@ -164,6 +174,12 @@ export default function ChangePasswordPage() {
         >
           {loading ? 'Updating...' : 'Change Password'}
         </button>
+
+        <div className="text-center mt-6">
+            <a href="/forgot-password" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+              Forgot your password?
+            </a>
+          </div>
       </form>
 
       <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">

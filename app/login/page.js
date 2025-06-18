@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
+import ReCAPTCHA from 'react-google-recaptcha'; //  NEW
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ user: '', password: '', token: '' });
+  const [recaptchaToken, setRecaptchaToken] = useState(''); //  NEW
   const [step, setStep] = useState(1);
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,14 +17,28 @@ export default function LoginPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleCaptchaChange = (token) => {
+    setRecaptchaToken(token);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!recaptchaToken) {
+      toast.error('Please complete the CAPTCHA');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: formData.user, password: formData.password }),
+        body: JSON.stringify({
+          user: formData.user,
+          password: formData.password,
+          recaptchaToken, // Include captcha token
+        }),
       });
       const data = await res.json();
 
@@ -32,13 +48,12 @@ export default function LoginPage() {
           setStep(2);
           toast('2FA required', { icon: '🔐' });
         } else {
-          // ✅ Save full user with 2FA flag
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify({
             id: data.user.id,
             username: data.user.username,
             email: data.user.email,
-            isTwoFactorEnabled: data.user.isTwoFactorEnabled, // ✅ Include this!
+            isTwoFactorEnabled: data.user.isTwoFactorEnabled,
           }));
           toast.success('Login successful!');
           setTimeout(() => router.push('/account'), 1200);
@@ -64,12 +79,11 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Save full user with 2FA flag
         localStorage.setItem("user", JSON.stringify({
           id: data.user.id,
           username: data.user.username,
           email: data.user.email,
-          isTwoFactorEnabled: data.user.isTwoFactorEnabled, // ✅ Include this!
+          isTwoFactorEnabled: data.user.isTwoFactorEnabled,
         }));
         localStorage.setItem("token", data.token);
         toast.success('2FA verified. Logging in...');
@@ -138,7 +152,16 @@ export default function LoginPage() {
                     />
                   </div>
                 </div>
+
+                {/*  CAPTCHA Below Password */}
+                <div className="pt-2 flex justify-center items-center">
+                  <ReCAPTCHA
+                    sitekey="6Lf9-lcrAAAAAAnejzsZ39-y-liBVtgGC3RXUElG" 
+                    onChange={handleCaptchaChange}
+                  />
+                </div>
               </div>
+
               <button
                 type="submit"
                 disabled={loading}
@@ -186,7 +209,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Security Note */}
         <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
           <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />

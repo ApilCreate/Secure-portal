@@ -38,8 +38,14 @@ model PasswordHistory {
 
 model ActivityLog {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  action    String // e.g., "Login", "Logout", "2FA Enabled", etc.
+  action    String
   timestamp DateTime @default(now())
+}
+
+model EmailVerification {
+  email     String   @id
+  otp       String
+  otpExpiry DateTime
 }

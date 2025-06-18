@@ -8,31 +8,26 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Email and OTP are required." }), { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    const record = await prisma.emailVerification.findUnique({
       where: { email },
     });
 
-    if (!user || !user.otp || !user.otpExpiry) {
+    if (!record || !record.otp || !record.otpExpiry) {
       return new Response(JSON.stringify({ error: "No OTP found for this email." }), { status: 400 });
     }
 
     const now = new Date();
-    if (user.otp !== otp) {
+    if (record.otp !== otp) {
       return new Response(JSON.stringify({ error: "Invalid OTP." }), { status: 400 });
     }
 
-    if (user.otpExpiry < now) {
+    if (record.otpExpiry < now) {
       return new Response(JSON.stringify({ error: "OTP has expired." }), { status: 400 });
     }
 
-    // ✅ OTP is valid — mark user as verified and clear OTP fields
-    await prisma.user.update({
+    // ✅ OTP is valid — delete the record (or mark as verified if needed)
+    await prisma.emailVerification.delete({
       where: { email },
-      data: {
-        isVerified: true,
-        otp: null,
-        otpExpiry: null,
-      },
     });
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
