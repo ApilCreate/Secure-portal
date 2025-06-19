@@ -10,7 +10,7 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "Missing token or password." }), { status: 400 });
     }
 
-    // ✅ 1. Verify token
+    // Verify token
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -20,7 +20,7 @@ export async function POST(request) {
 
     const userId = decoded.userId;
 
-    // ✅ 2. Find user
+    // Find user
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -29,7 +29,7 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "User not found." }), { status: 404 });
     }
 
-    // ✅ 3. Check against old password hashes
+    // Check against old password hashes
     const oldHashes = await prisma.passwordHistory.findMany({
       where: { userId },
     });
@@ -44,7 +44,7 @@ export async function POST(request) {
       }
     }
 
-    // ✅ 4. Store current password hash in history
+    // Store current password hash in history
     await prisma.passwordHistory.create({
       data: {
         userId,
@@ -52,7 +52,7 @@ export async function POST(request) {
       },
     });
 
-    // ✅ 5. Hash and update new password
+    // Hash and update new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await prisma.user.update({

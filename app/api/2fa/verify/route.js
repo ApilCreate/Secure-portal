@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import speakeasy from "speakeasy";
-import { logActivity } from "@/lib/logActivity"; // ✅ Import logActivity
+import { logActivity } from "@/lib/logActivity"; 
 
 export async function POST(request) {
   try {
@@ -64,11 +64,11 @@ export async function POST(request) {
         data: { isTwoFactorEnabled: true },
       });
 
-      // ✅ Log activity
+      // Log activity
       await logActivity(userId, 'Enabled 2FA');
     }
 
-    // ✅ Return safe user info including 2FA flag
+    // Return safe user info including 2FA flag
     return new Response(
       JSON.stringify({
         success: true,
@@ -83,7 +83,7 @@ export async function POST(request) {
     );
 
   } catch (error) {
-    console.error("❌ 2FA verification failed:", error);
+    console.error(" 2FA verification failed:", error);
     return new Response(
       JSON.stringify({ error: "Server error during verification." }),
       { status: 500 }

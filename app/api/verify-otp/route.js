@@ -25,7 +25,6 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "OTP has expired." }), { status: 400 });
     }
 
-    // ✅ OTP is valid — delete the record (or mark as verified if needed)
     await prisma.emailVerification.delete({
       where: { email },
     });

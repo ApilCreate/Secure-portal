@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha'; //  NEW
+import ReCAPTCHA from 'react-google-recaptcha'; 
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ user: '', password: '', token: '' });
-  const [recaptchaToken, setRecaptchaToken] = useState(''); //  NEW
+  const [recaptchaToken, setRecaptchaToken] = useState(''); 
   const [step, setStep] = useState(1);
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           user: formData.user,
           password: formData.password,
-          recaptchaToken, // Include captcha token
+          recaptchaToken,
         }),
       });
       const data = await res.json();

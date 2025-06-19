@@ -9,7 +9,7 @@ export default function TwoFactorSetupPage() {
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // Track current step
+  const [step, setStep] = useState(1); 
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
 
@@ -67,7 +67,6 @@ export default function TwoFactorSetupPage() {
       setShowSuccess(true);
       toast.success('2FA has been successfully enabled!');
 
-      // ✅ Update localStorage to reflect 2FA is enabled
       const stored = localStorage.getItem('user');
       if (stored) {
         const parsed = JSON.parse(stored);

@@ -47,8 +47,8 @@ export async function POST(request) {
         email,
         password: hashedPassword,
         isVerified: false,
-        isTwoFactorEnabled: false,      // ✅ Added default
-        twoFactorSecret: null           // ✅ Added default
+        isTwoFactorEnabled: false,      
+        twoFactorSecret: null           
       },
     });
 

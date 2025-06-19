@@ -153,7 +153,7 @@ export default function ChangePasswordPage() {
 
         {confirmPassword && (
           <p className={`text-sm ${passwordsMatch ? 'text-green-400' : 'text-red-400'}`}>
-            {passwordsMatch ? '✅ Passwords match' : '❌ Passwords do not match'}
+            {passwordsMatch ? ' Passwords match' : ' Passwords do not match'}
           </p>
         )}
 

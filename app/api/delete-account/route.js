@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import speakeasy from 'speakeasy';
-import { logActivity } from '@/lib/logActivity'; // ✅ Import logActivity
+import { logActivity } from '@/lib/logActivity';
 
 export async function POST(request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
     }
 
-    // 🔐 If 2FA is enabled, verify token
+    //  If 2FA is enabled, verify token
     if (user.isTwoFactorEnabled) {
       if (!token) {
         return new Response(JSON.stringify({ error: "2FA code required" }), { status: 400 });
@@ -47,10 +47,10 @@ export async function POST(request) {
       }
     }
 
-    // ✅ Log activity BEFORE deletion
+    // Log activity BEFORE deletion
     await logActivity(userId, 'Deleted Account');
 
-    // 🧹 Delete user
+    //  Delete user
     await prisma.user.delete({
       where: { id: userId },
     });
@@ -58,7 +58,7 @@ export async function POST(request) {
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 
   } catch (error) {
-    console.error("❌ Delete account error:", error);
+    console.error(" Delete account error:", error);
     return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
   }
 }

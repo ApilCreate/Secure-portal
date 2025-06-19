@@ -26,14 +26,14 @@ export default function TwoFactorVerifyPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage('✅ 2FA verification successful!');
+        setMessage('2FA verification successful!');
         // Redirect to dashboard or homepage
         router.push('/dashboard'); // You can change this
       } else {
-        setMessage(`❌ ${data.error || 'Verification failed'}`);
+        setMessage(`${data.error || 'Verification failed'}`);
       }
     } catch (err) {
-      setMessage('❌ Server error');
+      setMessage(' Server error');
     }
 
     setLoading(false);

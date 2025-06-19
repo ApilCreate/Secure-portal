@@ -42,17 +42,17 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setModalMessage('✅ 2FA disabled successfully');
+        setModalMessage(' 2FA disabled successfully');
         const updatedUser = { ...user, isTwoFactorEnabled: false };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
         setTimeout(() => setShowModal(false), 1000);
       } else {
-        setModalMessage(`❌ ${data.error}`);
+        setModalMessage(` ${data.error}`);
       }
     } catch (err) {
       console.error(err);
-      setModalMessage('❌ Server error. Try again.');
+      setModalMessage(' Server error. Try again.');
     }
   };
 
@@ -80,7 +80,7 @@ export default function AccountPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success('✅ Account deleted');
+        toast.success(' Account deleted');
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         router.push('/login');
@@ -270,7 +270,7 @@ export default function AccountPage() {
               </button>
             </div>
             {modalMessage && (
-              <p className={`text-center text-sm ${modalMessage.includes('✅') ? 'text-green-400' : 'text-red-400'}`}>
+              <p className={`text-center text-sm ${modalMessage.includes('') ? 'text-green-400' : 'text-red-400'}`}>
                 {modalMessage}
               </p>
             )}

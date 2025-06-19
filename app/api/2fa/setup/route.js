@@ -15,7 +15,7 @@ export async function POST(request) {
 
     // Generate a new TOTP secret
     const secret = speakeasy.generateSecret({
-      name: `SecurePortal`, // 👈 App name shown in Google Authenticator
+      name: `SecurePortal`, // App name shown in Google Authenticator
     });
 
     // Save secret to the user's record in the database
@@ -35,7 +35,7 @@ export async function POST(request) {
     );
 
   } catch (error) {
-    console.error("❌ 2FA Setup Error:", error);
+    console.error(" 2FA Setup Error:", error);
     return new Response(
       JSON.stringify({ error: "Server error while generating QR code." }),
       { status: 500 }

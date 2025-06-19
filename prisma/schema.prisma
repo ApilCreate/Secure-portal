@@ -13,10 +13,10 @@ model User {
   email              String    @unique
   password           String
   isVerified         Boolean   @default(false)
-  verifyToken        String? // ✅ for email verification
-  tokenExpiry        DateTime? // ✅ token expiration
-  otp                String? // ✅ OTP for verification
-  otpExpiry          DateTime? // ✅ Expiry time for OTP
+  verifyToken        String? // for email verification
+  tokenExpiry        DateTime? // token expiration
+  otp                String? // OTP for verification
+  otpExpiry          DateTime? // Expiry time for OTP
   loginAttempts      Int       @default(0)
   lockedUntil        DateTime?
   createdAt          DateTime  @default(now())
@@ -24,7 +24,7 @@ model User {
   isTwoFactorEnabled Boolean   @default(false)
 
   passwordHistory PasswordHistory[]
-  activityLogs    ActivityLog[] // ✅ Added reverse relation
+  activityLogs    ActivityLog[] 
 }
 
 model PasswordHistory {

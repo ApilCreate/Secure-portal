@@ -22,13 +22,13 @@ export default function ForgotPasswordPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage('✅ Check your email for a reset link.');
+        setMessage(' Check your email for a reset link.');
         setEmail('');
       } else {
-        setMessage(`❌ ${data.error}`);
+        setMessage(` ${data.error}`);
       }
     } catch (error) {
-      setMessage('❌ Something went wrong. Try again later.');
+      setMessage(' Something went wrong. Try again later.');
     }
 
     setLoading(false);

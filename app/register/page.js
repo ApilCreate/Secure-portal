@@ -19,7 +19,7 @@ export default function RegisterPage() {
 
   console.log("CAPTCHA token sending to server:", captchaToken);
 
-  // ✅ Password strength checker
+  // Password strength checker
   const getPasswordStrength = (password) => {
     let strength = 0;
     if (password.length >= 8) strength++;
@@ -95,7 +95,7 @@ const handleResendOtp = async () => {
     setMessage('');
 
     if (!captchaToken) {
-      setMessage("❌ Please complete the CAPTCHA.");
+      setMessage(" Please complete the CAPTCHA.");
       setLoading(false);
       return;
     }
@@ -111,14 +111,14 @@ const handleResendOtp = async () => {
         const data = await res.json();
 
         if (res.ok) {
-          toast.success("✅ OTP sent to your email.");
+          toast.success(" OTP sent to your email.");
           setIsOtpSent(true);
         } else {
-          setMessage(`❌ ${data.error}`);
+          setMessage(` ${data.error}`);
         }
       } catch (error) {
         console.error(error);
-        setMessage("❌ Failed to send OTP.");
+        setMessage(" Failed to send OTP.");
       }
 
       setLoading(false);
@@ -126,7 +126,7 @@ const handleResendOtp = async () => {
     }
 
     if (!emailVerified) {
-      setMessage("❌ Please verify the OTP sent to your email.");
+      setMessage(" Please verify the OTP sent to your email.");
       setLoading(false);
       return;
     }
@@ -143,18 +143,18 @@ const handleResendOtp = async () => {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage('✅ Registration successful!');
+        setMessage(' Registration successful!');
         setFormData({ username: '', email: '', password: '' });
         setCaptchaToken(null);
         setOtp('');
         setIsOtpSent(false);
         setEmailVerified(false);
       } else {
-        setMessage(`❌ ${data.error || 'Registration failed'}`);
+        setMessage(` ${data.error || 'Registration failed'}`);
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessage('❌ Server error. Try again later.');
+      setMessage(' Server error. Try again later.');
     }
 
     setLoading(false);
@@ -341,7 +341,7 @@ const handleResendOtp = async () => {
           {/* Message */}
           {message && (
             <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-              <p className={`text-center text-sm font-medium ${message.includes('✅') ? 'text-green-400' : 'text-red-400'
+              <p className={`text-center text-sm font-medium ${message.includes('') ? 'text-green-400' : 'text-red-400'
                 }`}>
                 {message}
               </p>

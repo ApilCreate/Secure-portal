@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success('✅ Password reset successful! Redirecting...');
+        toast.success(' Password reset successful! Redirecting...');
         setTimeout(() => router.push(redirectTo), 2000);
       } else {
         toast.error(data.error || 'Reset failed');
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
 
           {confirm && (
             <p className={`text-sm ${passwordsMatch ? 'text-green-400' : 'text-red-400'}`}>
-              {passwordsMatch ? '✅ Passwords match' : '❌ Passwords do not match'}
+              {passwordsMatch ? ' Passwords match' : ' Passwords do not match'}
             </p>
           )}
 

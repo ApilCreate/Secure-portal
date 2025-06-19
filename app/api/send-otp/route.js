@@ -10,24 +10,24 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Email is required" }), { status: 400 });
     }
 
-    // ✅ Block if user already registered
+    // Block if user already registered
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return new Response(JSON.stringify({ error: "User already registered with this email" }), { status: 400 });
     }
 
-    // ✅ Generate OTP
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = addMinutes(new Date(), 10);
 
-    // ✅ Temporarily store OTP in a "verification" table or a cache
+    // Temporarily store OTP in a "verification" table or a cache
     await prisma.emailVerification.upsert({
       where: { email },
       update: { otp, otpExpiry: expiry },
       create: { email, otp, otpExpiry: expiry },
     });
 
-    // ✅ Send email
+    // Send email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

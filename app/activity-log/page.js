@@ -202,7 +202,6 @@ export default function ActivityLogPage() {
                           </div>
                         </div>
 
-                        {/* Additional details if available */}
                         {log.details && (
                           <p className="text-gray-300 text-sm">
                             {log.details}
@@ -218,7 +217,6 @@ export default function ActivityLogPage() {
               })}
             </div>
 
-            {/* Load More Button (if you implement pagination) */}
             {logs.length >= 10 && (
               <div className="text-center pt-8">
                 <button className="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200 border border-gray-700">
