@@ -1,17 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha'; 
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ user: '', password: '', token: '' });
-  const [recaptchaToken, setRecaptchaToken] = useState(''); 
+  const [recaptchaToken, setRecaptchaToken] = useState('');
   const [step, setStep] = useState(1);
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    let interval;
+    if (remainingTime !== null && remainingTime > 0) {
+      interval = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [remainingTime]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,6 +57,7 @@ export default function LoginPage() {
           recaptchaToken,
         }),
       });
+
       const data = await res.json();
 
       if (res.ok) {
@@ -60,6 +78,14 @@ export default function LoginPage() {
         }
       } else {
         toast.error(data.error || 'Login failed');
+
+        if (data.attemptsLeft !== undefined) {
+          toast(`Attempts left: ${data.attemptsLeft}`, { icon: '⚠️' });
+        }
+
+        if (data.remainingTime !== undefined) {
+          setRemainingTime(data.remainingTime);
+        }
       }
     } catch (err) {
       toast.error('Server error. Try again later.');
@@ -156,12 +182,17 @@ export default function LoginPage() {
                 {/*  CAPTCHA Below Password */}
                 <div className="pt-2 flex justify-center items-center">
                   <ReCAPTCHA
-                    sitekey="6Lf9-lcrAAAAAAnejzsZ39-y-liBVtgGC3RXUElG" 
+                    sitekey="6Lf9-lcrAAAAAAnejzsZ39-y-liBVtgGC3RXUElG"
                     onChange={handleCaptchaChange}
                   />
                 </div>
               </div>
 
+              {remainingTime !== null && (
+                <div className="text-center text-red-400 text-sm mt-2">
+                  Try again in {Math.floor(remainingTime / 60)}m {remainingTime % 60}s
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={loading}

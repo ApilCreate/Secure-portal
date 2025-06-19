@@ -46,6 +46,9 @@ export default function ActivityLogPage() {
 
   const getActionIcon = (action) => {
     const actionType = action.toLowerCase();
+
+    if (actionType.includes('failed login')) return ShieldX;        
+    if (actionType.includes('reset password')) return Key;         
     if (actionType.includes('login') || actionType.includes('sign in')) return Shield;
     if (actionType.includes('logout') || actionType.includes('sign out')) return LogOut;
     if (actionType.includes('create') || actionType.includes('add')) return Plus;
@@ -55,11 +58,16 @@ export default function ActivityLogPage() {
     if (actionType.includes('2fa') && actionType.includes('enabled')) return ShieldCheck;
     if (actionType.includes('2fa') && actionType.includes('disabled')) return ShieldX;
     if (actionType.includes('password') && actionType.includes('changed')) return Key;
+
     return FileText;
   };
 
+
   const getActionColor = (action) => {
     const actionType = action.toLowerCase();
+
+    if (actionType.includes('failed login')) return 'from-rose-500/20 to-rose-600/10 border-rose-500/30';       
+    if (actionType.includes('reset password')) return 'from-orange-500/20 to-orange-600/10 border-orange-500/30'; 
     if (actionType.includes('login') || actionType.includes('sign in')) return 'from-gray-500/20 to-gray-600/10 border-gray-500/30';
     if (actionType.includes('logout') || actionType.includes('sign out')) return 'from-red-500/20 to-red-600/10 border-red-500/30';
     if (actionType.includes('create') || actionType.includes('add')) return 'from-blue-500/20 to-blue-600/10 border-blue-500/30';
@@ -68,8 +76,10 @@ export default function ActivityLogPage() {
     if (actionType.includes('2fa') && actionType.includes('enabled')) return 'from-green-500/20 to-green-600/10 border-green-500/30';
     if (actionType.includes('2fa') && actionType.includes('disabled')) return 'from-red-500/20 to-red-600/10 border-red-500/30';
     if (actionType.includes('password') && actionType.includes('changed')) return 'from-purple-500/20 to-purple-600/10 border-purple-500/30';
+
     return 'from-gray-500/20 to-gray-600/10 border-gray-500/30';
   };
+
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);

@@ -9,7 +9,7 @@ export default function TwoFactorSetupPage() {
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
 
@@ -53,63 +53,53 @@ export default function TwoFactorSetupPage() {
   };
 
   const handleVerify = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch('/api/2fa/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, token }),
-    });
+    setLoading(true);
+    try {
+      const res = await fetch('/api/2fa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, token }),
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      setStep(3);
-      setShowSuccess(true);
-      toast.success('2FA has been successfully enabled!');
+      const data = await res.json();
+      if (data.success) {
+        setStep(3);
+        setShowSuccess(true);
+        toast.success('2FA has been successfully enabled!');
 
-      const stored = localStorage.getItem('user');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        parsed.isTwoFactorEnabled = true;
-        localStorage.setItem('user', JSON.stringify(parsed));
+        const stored = localStorage.getItem('user');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          parsed.isTwoFactorEnabled = true;
+          localStorage.setItem('user', JSON.stringify(parsed));
+        }
+
+        setTimeout(() => router.push('/account'), 2500);
+      } else {
+        toast.error(data.error || 'Verification failed.');
       }
-
-      setTimeout(() => router.push('/account'), 2500);
-    } else {
-      toast.error(data.error || 'Verification failed.');
+    } catch (err) {
+      console.error(err);
+      toast.error('Server error. Try again later.');
     }
-  } catch (err) {
-    console.error(err);
-    toast.error('Server error. Try again later.');
-  }
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
 
   const handleTokenChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ''); 
+    const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 6) {
       setToken(value);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex flex-col items-center justify-center p-6">
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(132,204,22,0.1),transparent_50%)]"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-lime-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-green-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
       <div className="absolute top-1/2 right-0 w-64 h-64 bg-lime-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
-      
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-lime-400/30 rounded-full animate-bounce delay-700"></div>
-        <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-lime-300/40 rounded-full animate-bounce delay-1000"></div>
-        <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-lime-500/20 rounded-full animate-bounce delay-300"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-1 h-1 bg-lime-400/25 rounded-full animate-bounce delay-1200"></div>
-      </div>
-      
-      <Toaster 
+
+      <Toaster
         position="top-center"
         toastOptions={{
           style: {
@@ -133,20 +123,19 @@ export default function TwoFactorSetupPage() {
       </button>
 
       {/* Main Card */}
-      <div className="bg-black/40 backdrop-blur-2xl border-2 border-lime-500/30 shadow-2xl shadow-lime-500/10 rounded-3xl p-8 w-full max-w-md space-y-8 relative z-10 transform transition-all duration-700 hover:shadow-lime-500/20 hover:shadow-2xl hover:border-lime-400/50">
-        
+      <div className="bg-black/40 backdrop-blur-2xl border-1 border-lime-500/90 shadow-2xl shadow-lime-500/10 rounded-3xl p-8 w-full max-w-md space-y-8 relative z-10 transform transition-all duration-700 hover:shadow-lime-500/20 hover:shadow-2xl hover:border-lime-400/50">
+
         {/* Glowing border effect */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-lime-500/20 via-transparent to-lime-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-        
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-lime-500/20 via-transparent to-lime-500/90 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
         {/* Progress Indicator */}
         <div className="flex items-center justify-center space-x-4 mb-8">
           {[1, 2, 3].map((stepNum) => (
             <div key={stepNum} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
-                step >= stepNum 
-                  ? 'bg-gradient-to-r from-lime-400 to-lime-600 text-black shadow-lg shadow-lime-500/40 animate-pulse' 
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${step >= stepNum
+                  ? 'bg-gradient-to-r from-lime-400 to-lime-600 text-black shadow-lg shadow-lime-500/40 animate-pulse'
                   : 'bg-white/10 text-white/40 border border-white/20'
-              }`}>
+                }`}>
                 {step > stepNum ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -156,9 +145,8 @@ export default function TwoFactorSetupPage() {
                 )}
               </div>
               {stepNum < 3 && (
-                <div className={`w-12 h-0.5 mx-2 transition-all duration-500 ${
-                  step > stepNum ? 'bg-gradient-to-r from-lime-400 to-lime-600 shadow-sm shadow-lime-500/50' : 'bg-white/20'
-                }`}></div>
+                <div className={`w-12 h-0.5 mx-2 transition-all duration-500 ${step > stepNum ? 'bg-gradient-to-r from-lime-400 to-lime-600 shadow-sm shadow-lime-500/50' : 'bg-white/20'
+                  }`}></div>
               )}
             </div>
           ))}
@@ -203,7 +191,7 @@ export default function TwoFactorSetupPage() {
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={handleSetup}
               disabled={loading}
@@ -226,9 +214,9 @@ export default function TwoFactorSetupPage() {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-4">
               <div className="inline-block p-4 bg-white rounded-2xl shadow-lg border-2 border-lime-400/30">
-                <img 
-                  src={qrCode} 
-                  alt="QR Code for 2FA setup" 
+                <img
+                  src={qrCode}
+                  alt="QR Code for 2FA setup"
                   className="w-48 h-48 mx-auto rounded-lg"
                 />
               </div>
@@ -253,11 +241,11 @@ export default function TwoFactorSetupPage() {
                   maxLength={6}
                 />
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-lime-500/10 to-lime-400/10 opacity-0 transition-opacity duration-300 focus-within:opacity-100 pointer-events-none"></div>
-                
+
                 {/* Animated border glow */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-lime-400/20 via-transparent to-lime-400/20 opacity-0 animate-pulse pointer-events-none"></div>
               </div>
-              
+
               <button
                 onClick={handleVerify}
                 disabled={loading || token.length !== 6}
@@ -290,20 +278,20 @@ export default function TwoFactorSetupPage() {
                 Two-factor authentication has been <span className="text-lime-400 font-semibold">successfully enabled</span> on your account. Your security just got a major upgrade!
               </p>
             </div>
-            
-            {/* Enhanced progress bar */}
+
+            {/* Simple dark theme progress bar */}
             <div className="space-y-2">
-              <div className="flex justify-between text-xs text-lime-400 font-medium">
+              <div className="flex justify-between text-sm text-lime-300 font-medium">
                 <span>Redirecting...</span>
                 <span>100%</span>
               </div>
-              <div className="w-full bg-black/30 rounded-full h-3 overflow-hidden border border-lime-500/30">
-                <div className="h-full bg-gradient-to-r from-lime-400 to-lime-600 animate-pulse shadow-sm shadow-lime-500/50 rounded-full relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+              <div className="w-full bg-gray-800/80 rounded-full h-3 overflow-hidden border border-lime-500/30">
+                <div className="h-full bg-lime-400 rounded-full shadow-sm shadow-lime-400/50">
+                  <div className="h-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse rounded-full"></div>
                 </div>
               </div>
             </div>
-            
+
             {/* Security badges */}
             <div className="flex justify-center space-x-4 pt-4">
               <div className="flex items-center space-x-2 bg-lime-500/10 border border-lime-500/30 rounded-full px-3 py-1">

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { logActivity } from "@/lib/logActivity"; // Import the logger
 
 export async function POST(request) {
   try {
@@ -38,7 +39,7 @@ export async function POST(request) {
       const match = await bcrypt.compare(password, entry.hash);
       if (match) {
         return new Response(
-          JSON.stringify({ error: "⚠️ Please choose a different password — reuse not allowed." }),
+          JSON.stringify({ error: " Please choose a different password — reuse not allowed." }),
           { status: 400 }
         );
       }
@@ -63,6 +64,9 @@ export async function POST(request) {
         isVerified: true,
       },
     });
+
+    // Log the reset password action
+    await logActivity(userId, "Reset Password");
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 
