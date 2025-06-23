@@ -15,6 +15,7 @@ export default function AccountPage() {
   const [deleteToken, setDeleteToken] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -63,6 +64,11 @@ export default function AccountPage() {
       toast.error('Please enter your 6-digit 2FA code.');
       return;
     }
+    if (!user.isTwoFactorEnabled && !deletePassword) {
+      toast.error('Please enter your password to confirm.');
+      return;
+    }
+
 
     setDeleteLoading(true);
     setDeleteError('');
@@ -74,8 +80,10 @@ export default function AccountPage() {
         body: JSON.stringify({
           userId: user.id,
           token: user.isTwoFactorEnabled ? deleteToken : undefined,
+          password: !user.isTwoFactorEnabled ? deletePassword : undefined,
         }),
       });
+
 
       const data = await res.json();
 
@@ -105,7 +113,6 @@ export default function AccountPage() {
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-black bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] flex flex-col items-center justify-center p-4 space-y-8">
@@ -281,9 +288,19 @@ export default function AccountPage() {
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-zinc-900 rounded-xl p-6 space-y-4 shadow-xl w-full max-w-md border border-white/10">
             <h2 className="text-white text-xl font-bold">Delete Your Account</h2>
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-gray-300 mb-2">
               Are you sure you want to delete your account? This action is permanent.
             </p>
+            {!user.isTwoFactorEnabled && (
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter your password to confirm"
+                className="w-full mt-2 px-4 py-2 rounded-lg border border-zinc-700 bg-zinc-800 text-white placeholder-gray-500"
+              />
+            )}
+
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -339,7 +356,6 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

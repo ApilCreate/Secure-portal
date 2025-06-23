@@ -13,6 +13,24 @@ export default function ChangePasswordPage() {
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [show2FA, setShow2FA] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const eyeIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  );
+
+  const eyeOffIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.11.2-2.17.57-3.15m1.54-2.37A8.95 8.95 0 0112 3c5 0 9 4 9 9 0 1.43-.31 2.79-.88 4.01M9.88 9.88a3 3 0 104.24 4.24" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" />
+    </svg>
+  );
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -112,23 +130,43 @@ export default function ChangePasswordPage() {
       </div>
 
       <form onSubmit={handleChangePassword} className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6">
-        <input
-          type="password"
-          placeholder="Current Password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          required
-          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
-        />
+        {/* Current Password */}
+        <div className="relative">
+          <input
+            type={showCurrent ? "text" : "password"}
+            placeholder="Current Password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            required
+            className="w-full p-4 pr-12 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+          />
+          <button
+            type="button"
+            onClick={() => setShowCurrent((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-white"
+          >
+            {showCurrent ? eyeOffIcon : eyeIcon}
+          </button>
+        </div>
 
-        <input
-          type="password"
-          placeholder="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
-        />
+        {/* New Password */}
+        <div className="relative">
+          <input
+            type={showNew ? "text" : "password"}
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            className="w-full p-4 pr-12 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+          />
+          <button
+            type="button"
+            onClick={() => setShowNew((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-white"
+          >
+            {showNew ? eyeOffIcon : eyeIcon}
+          </button>
+        </div>
 
         {passwordStrength && (
           <div className="text-xs text-white">
@@ -142,14 +180,24 @@ export default function ChangePasswordPage() {
           </div>
         )}
 
-        <input
-          type="password"
-          placeholder="Confirm New Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          className="w-full p-4 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
-        />
+        {/* Confirm New Password */}
+        <div className="relative">
+          <input
+            type={showConfirm ? "text" : "password"}
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="w-full p-4 pr-12 bg-black/30 text-white placeholder-gray-400 border border-gray-700 rounded-xl"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-white"
+          >
+            {showConfirm ? eyeOffIcon : eyeIcon}
+          </button>
+        </div>
 
         {confirmPassword && (
           <p className={`text-sm ${passwordsMatch ? 'text-green-400' : 'text-red-400'}`}>
@@ -176,11 +224,12 @@ export default function ChangePasswordPage() {
         </button>
 
         <div className="text-center mt-6">
-            <a href="/forgot-password" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
-              Forgot your password?
-            </a>
-          </div>
+          <a href="/forgot-password" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+            Forgot your password?
+          </a>
+        </div>
       </form>
+
 
       <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
         <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
