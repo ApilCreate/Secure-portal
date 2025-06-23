@@ -120,7 +120,7 @@ export default function AccountPage() {
       {/* Header */}
       <div className="text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 rounded-2xl mb-4 shadow-lg">
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
@@ -155,42 +155,55 @@ export default function AccountPage() {
 
         {/* Action Buttons */}
         <div className="space-y-4">
-          <a href='/activity-log'
-            className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"
+          <a
+            href="/activity-log"
+            className="btn-shimmer relative w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40 transition duration-300 overflow-hidden"
           >
-            Activity Status
+            <svg className="w-5 h-5 text-lime-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5h6M9 9h6M9 13h6M5 7h.01M5 11h.01M5 15h.01M19 5a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h14z" />
+            </svg>
+            <span className="z-10">Activity Status</span>
           </a>
 
-          <a
-            href="/change-password"
-            className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"
+          <a href="/change-password"
+            className="btn-shimmer relative w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40 transition duration-300 overflow-hidden"
           >
-            <svg className="w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            <svg
+              className="w-5 h-5 text-lime-400 stroke-[1.5] z-10"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+              />
             </svg>
-            <span>Change Password</span>
+            <span className="z-10">Change Password</span>
           </a>
 
           {/* Conditional 2FA button */}
           {user.isTwoFactorEnabled ? (
             <button
               onClick={() => setShowModal(true)}
-              className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"
+              className="btn-shimmer relative w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40 transition duration-300 overflow-hidden"
             >
-              <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-yellow-400 stroke-[1.5] z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
               </svg>
-              <span>Disable 2FA</span>
+              <span className="z-10">Disable 2FA</span>
             </button>
           ) : (
             <a
               href="/2fa/setup"
-              className="w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40"
+              className="btn-shimmer relative w-full flex items-center justify-center space-x-3 p-4 bg-black/30 text-white border border-gray-700 rounded-xl hover:bg-black/40 transition duration-300 overflow-hidden"
             >
-              <svg className="w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-lime-400 stroke-[1.5] z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <span>Enable 2FA</span>
+              <span className="z-10">Enable 2FA</span>
             </a>
           )}
 
