@@ -200,14 +200,14 @@ export default function LoginPage() {
                       )}
                     </button>
                   </div>
-
                 </div>
 
                 {/*  CAPTCHA Below Password */}
                 <div className="pt-2 flex justify-center items-center">
                   <ReCAPTCHA
-                    sitekey="6Lf9-lcrAAAAAAnejzsZ39-y-liBVtgGC3RXUElG"
+                    sitekey="6Lde82orAAAAAA-iEZNe2HKU2GNEwPUqnqutcKt8"
                     onChange={handleCaptchaChange}
+                    theme='dark'
                   />
                 </div>
               </div>
