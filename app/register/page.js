@@ -237,7 +237,7 @@ export default function RegisterPage() {
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="new_user_password"
+                  name="password"
                   value={formData.password}
                   autoComplete="new-password"
                   onChange={handleChange}

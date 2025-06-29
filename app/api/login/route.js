@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { logActivity } from '@/lib/logActivity';
+import { sendEmail } from '@/lib/mailer';
 
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY;
 
@@ -12,7 +13,7 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
     }
 
-    // reCAPTCHA Verification
+     // reCAPTCHA Verification
     const captchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -73,6 +74,20 @@ export async function POST(request) {
 
       await logActivity(existingUser.id, 'Failed Login Attempt');
 
+      // Send Email Notification on Lockout
+      if (lockedUntil) {
+        await sendEmail({
+          to: existingUser.email,
+          subject: 'Account Locked Due to Failed Login Attempts',
+          html: `
+            <h2>Your account has been temporarily locked</h2>
+            <p>We detected 5 consecutive failed login attempts to your account.</p>
+            <p>As a security measure, your account is locked until <strong>${lockedUntil.toLocaleString()}</strong>.</p>
+            <p>If this wasn't you, we recommend resetting your password.</p>
+          `,
+        });
+      }
+
       return new Response(JSON.stringify({
         error: 'Invalid password',
         attemptsLeft: Math.max(lockoutThreshold - newAttempts, 0),
@@ -105,6 +120,19 @@ export async function POST(request) {
 
     // Log successful login
     await logActivity(existingUser.id, 'Login');
+
+    // Send Email Notification on Successful Login
+    await sendEmail({
+      to: existingUser.email,
+      subject: 'New Login Notification',
+      html: `
+        <h2>New Login Detected</h2>
+        <p>Your account was just accessed successfully.</p>
+        <p>If this was you, no further action is needed. If not, please reset your password immediately.</p>
+        <p><strong>Time:</strong> ${now.toLocaleString()}</p>
+        <p><strong>Account:</strong> ${existingUser.email}</p>
+      `,
+    });
 
     return new Response(JSON.stringify({
       success: true,

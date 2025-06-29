@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { logActivity } from '@/lib/logActivity';
+import { sendEmail } from '@/lib/mailer';
 
 export async function POST(request) {
   try {
@@ -39,16 +40,26 @@ export async function POST(request) {
         twoFactorSecret: null,
       },
     });
-    // Log the activity
-    console.log(' Calling logActivity...');
-    await logActivity(userId, 'Disabled 2FA');
-    console.log(' logActivity call finished');
 
+    // Log the activity
+    console.log('Calling logActivity...');
+    await logActivity(userId, 'Disabled 2FA');
+    console.log('logActivity call finished');
+
+    // Send email notification
+    await sendEmail({
+      to: user.email,
+      subject: 'Two-Factor Authentication Disabled',
+      html: `
+        <h2>2FA Disabled</h2>
+        <p>Your account's Two-Factor Authentication was <strong>disabled</strong> on <strong>${new Date().toLocaleString()}</strong>.</p>
+        <p>If you did not do this, please secure your account immediately or contact support.</p>
+      `,
+    });
 
     return new Response(JSON.stringify({ success: true, message: '2FA disabled successfully.' }), { status: 200 });
   } catch (error) {
     console.error('Disable 2FA error:', error);
     return new Response(JSON.stringify({ error: 'Server error while disabling 2FA.' }), { status: 500 });
   }
-
 }

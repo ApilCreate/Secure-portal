@@ -1,6 +1,6 @@
 ### Secure Portal
 
-A modern, secure authentication portal built with Next.js, Prisma, and SQLite, featuring advanced security measures such as Two-Factor Authentication (2FA), OTP-based email verification, Google reCAPTCHA, and account lockout. The application provides a responsive, dark-themed user interface with a glassmorphism design and animated background, ensuring an engaging user experience along with all the security assuring features.
+This project is a  modern, secure authentication portal built with Next.js, Prisma, and SQLite, featuring advanced security measures such as Two-Factor Authentication (2FA), OTP-based Email verification, Realtime Email Notification, Google reCAPTCHA, and account lockout. The application provides a responsive, dark-themed user interface with a glassmorphism design and animated background, ensuring an engaging user experience along with all the security assuring features.
 
 ### Table of Contents
 
@@ -19,7 +19,7 @@ A modern, secure authentication portal built with Next.js, Prisma, and SQLite, f
 
 # 1. Project Overview
 
-The Secure Auth Portal is a full-stack web application designed to provide a robust and user-friendly authentication system. It incorporates industry-standard security practices to protect user data and prevent unauthorized access. The project is ideal for demonstrating proficiency in modern web development, security implementation, and responsive UI design.
+The Secure Auth Portal is a full-stack web application designed to provide a robust and user-friendly authentication system. It incorporates industry-standard security practices to protect user data and prevent unauthorized access. The project is designed demonstrating proficiency in modern web development, security implementation, and responsive UI design.
 
 Key highlights:
 
@@ -27,7 +27,7 @@ Key highlights:
 - 2 Factor Authentication (2FA) using Time-Based One-Time Passwords (TOTP)
 - Google reCAPTCHA v2 to prevent bot registrations
 - Account lockout after multiple failed login attempts
-- Activity logging for tracking user actions
+- Activity logging for tracking user actions with Email notification
 - Responsive UI with Tailwind CSS and glassmorphism design
 
 # 2. Features
@@ -38,7 +38,7 @@ Key highlights:
 - Account Deletion: Requires password or 2FA confirmation, followed by a confirmation email.
 - Google reCAPTCHA: Protects against automated bot registrations.
 - Password Strength Meter: Visual feedback for password complexity.
-- Activity Log: Tracks user actions (login, logout, password changes, 2FA events).
+- Activity Log: Tracks user actions (login, logout, password changes, 2FA events) and sends email if any changes made.
 - Account Lockout: Temporarily locks accounts after consecutive failed login attempts with a countdown timer.
 - Password Visibility Toggle: Enhances user experience on password inputs.
 - Toast Notifications: Provides real-time feedback for user actions.
@@ -85,7 +85,6 @@ Follow these steps to set up and run the project locally.
 - A Gmail account for Nodemailer (with an App Password for SMTP)
 - Google reCAPTCHA API keys (Site Key and Secret Key)
 
-
 # 6. Install dependencies:
 - Open the folder inside your IDE and open terminal.
 - Type cd secure-portal
@@ -117,6 +116,13 @@ JWT_SECRET=your-32-character-jwt-secret
 
 Start the development server:
 - Type npm run dev
+
+To See realtime database:
+- Type npx prisma studio
+
+Or
+
+Import prisma/dev.db file inside SQLite
 
 
 # Open the application in your browser:

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import speakeasy from 'speakeasy';
 import zxcvbn from 'zxcvbn';
 import { logActivity } from '@/lib/logActivity'; 
+import { sendEmail } from '@/lib/mailer';
 
 export async function POST(request) {
     try {
@@ -66,7 +67,19 @@ export async function POST(request) {
             },
         });
 
+        // Log the activity
         await logActivity(userId, 'Changed Password');
+
+        // Send email notification
+        await sendEmail({
+            to: user.email,
+            subject: 'Your Password Has Been Changed',
+            html: `
+                <h2>Password Change Successful</h2>
+                <p>Your account password was successfully changed on <strong>${new Date().toLocaleString()}</strong>.</p>
+                <p>If this wasn’t you, please reset your password immediately or contact support.</p>
+            `,
+        });
 
         return new Response(JSON.stringify({ success: true }), { status: 200 });
 
