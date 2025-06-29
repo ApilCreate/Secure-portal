@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import toast, { Toaster } from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({ user: '', password: '', token: '' });
-  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [formData, setFormData] = useState({
+    user: "",
+    password: "",
+    token: "",
+  });
+  const [recaptchaToken, setRecaptchaToken] = useState("");
   const [step, setStep] = useState(1);
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [remainingTime, setRemainingTime] = useState(null);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
 
   useEffect(() => {
     let interval;
@@ -44,15 +47,15 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!recaptchaToken) {
-      toast.error('Please complete the CAPTCHA');
+      toast.error("Please complete the CAPTCHA");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user: formData.user,
           password: formData.password,
@@ -66,23 +69,26 @@ export default function LoginPage() {
         if (data.twoFactorRequired) {
           setUserId(data.userId);
           setStep(2);
-          toast('2FA required', { icon: '🔐' });
+          toast("2FA required", { icon: "🔐" });
         } else {
           localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify({
-            id: data.user.id,
-            username: data.user.username,
-            email: data.user.email,
-            isTwoFactorEnabled: data.user.isTwoFactorEnabled,
-          }));
-          toast.success('Login successful!');
-          setTimeout(() => router.push('/account'), 1200);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              id: data.user.id,
+              username: data.user.username,
+              email: data.user.email,
+              isTwoFactorEnabled: data.user.isTwoFactorEnabled,
+            })
+          );
+          toast.success("Login successful!");
+          setTimeout(() => router.push("/account"), 1200);
         }
       } else {
-        toast.error(data.error || 'Login failed');
+        toast.error(data.error || "Login failed");
 
         if (data.attemptsLeft !== undefined) {
-          toast(`Attempts left: ${data.attemptsLeft}`, { icon: '⚠️' });
+          toast(`Attempts left: ${data.attemptsLeft}`, { icon: "⚠️" });
         }
 
         if (data.remainingTime !== undefined) {
@@ -90,7 +96,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      toast.error('Server error. Try again later.');
+      toast.error("Server error. Try again later.");
     }
     setLoading(false);
   };
@@ -98,29 +104,32 @@ export default function LoginPage() {
   const handle2FAVerify = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/2fa/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/2fa/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, token: formData.token }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("user", JSON.stringify({
-          id: data.user.id,
-          username: data.user.username,
-          email: data.user.email,
-          isTwoFactorEnabled: data.user.isTwoFactorEnabled,
-        }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: data.user.id,
+            username: data.user.username,
+            email: data.user.email,
+            isTwoFactorEnabled: data.user.isTwoFactorEnabled,
+          })
+        );
         localStorage.setItem("token", data.token);
-        toast.success('2FA verified. Logging in...');
-        setTimeout(() => router.push('/account'), 1200);
+        toast.success("2FA verified. Logging in...");
+        setTimeout(() => router.push("/account"), 1200);
       } else {
-        toast.error(data.error || 'Verification failed');
+        toast.error(data.error || "Verification failed");
       }
     } catch (err) {
-      toast.error('Server error during 2FA.');
+      toast.error("Server error during 2FA.");
     }
     setLoading(false);
   };
@@ -132,15 +141,27 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-400 rounded-3xl mb-6">
-            <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <svg
+              className="w-8 h-8 text-black"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
             </svg>
           </div>
           <h1 className="text-3xl font-semibold text-white mb-2">
-            {step === 1 ? 'Welcome Back' : 'Verify Identity'}
+            {step === 1 ? "Welcome Back" : "Verify Identity"}
           </h1>
           <p className="text-slate-400 text-base">
-            {step === 1 ? 'Sign in to your account' : 'Enter your 2FA code to continue'}
+            {step === 1
+              ? "Sign in to your account"
+              : "Enter your 2FA code to continue"}
           </p>
         </div>
 
@@ -149,7 +170,10 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="user" className="block text-sm font-medium text-white mb-2">
+                  <label
+                    htmlFor="user"
+                    className="block text-sm font-medium text-white mb-2"
+                  >
                     Username or Email
                   </label>
                   <input
@@ -164,22 +188,37 @@ export default function LoginPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-white mb-2"
+                  >
                     Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
                       </svg>
                     </div>
                     <input
                       type={showPassword ? "text" : "password"}
+                      id="password"
                       name="password"
+                      autoComplete="new-password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Password"
-                      className="w-full pl-12 pr-10 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                      className="w-full pl-12 pr-10 py-3 bg-zinc-800 text-white placeholder-slate-500 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 autofill:bg-zinc-800 autofill:text-white transition-all duration-200"
                       required
                     />
                     <button
@@ -188,14 +227,46 @@ export default function LoginPage() {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
                     >
                       {showPassword ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.11.2-2.17.57-3.15m1.54-2.37A8.95 8.95 0 0112 3c5 0 9 4 9 9 0 1.43-.31 2.79-.88 4.01M9.88 9.88a3 3 0 104.24 4.24" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.11.2-2.17.57-3.15m1.54-2.37A8.95 8.95 0 0112 3c5 0 9 4 9 9 0 1.43-.31 2.79-.88 4.01M9.88 9.88a3 3 0 104.24 4.24"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M3 3l18 18"
+                          />
                         </svg>
                       ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       )}
                     </button>
@@ -207,14 +278,15 @@ export default function LoginPage() {
                   <ReCAPTCHA
                     sitekey="6Lde82orAAAAAA-iEZNe2HKU2GNEwPUqnqutcKt8"
                     onChange={handleCaptchaChange}
-                    theme='dark'
+                    theme="dark"
                   />
                 </div>
               </div>
 
               {remainingTime !== null && (
                 <div className="text-center text-red-400 text-sm mt-2">
-                  Try again in {Math.floor(remainingTime / 60)}m {remainingTime % 60}s
+                  Try again in {Math.floor(remainingTime / 60)}m{" "}
+                  {remainingTime % 60}s
                 </div>
               )}
               <button
@@ -222,13 +294,16 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? "Signing in..." : "Sign In"}
               </button>
             </form>
           ) : (
             <div className="space-y-6">
               <div>
-                <label htmlFor="token" className="block text-sm font-medium text-white mb-2">
+                <label
+                  htmlFor="token"
+                  className="block text-sm font-medium text-white mb-2"
+                >
                   Authentication Code
                 </label>
                 <input
@@ -247,25 +322,35 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
               >
-                {loading ? 'Verifying...' : 'Verify Code'}
+                {loading ? "Verifying..." : "Verify Code"}
               </button>
             </div>
           )}
 
           <div className="text-center mt-6">
-            <a href="/forgot-password" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+            <a
+              href="/forgot-password"
+              className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200"
+            >
               Forgot your password?
             </a>
           </div>
           <div className="text-center mt-4">
-            <a href="/register" className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200">
+            <a
+              href="/register"
+              className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200"
+            >
               No account? Sign up
             </a>
           </div>
         </div>
 
         <div className="text-center mt-6 flex items-center justify-center space-x-2 text-slate-400 text-sm">
-          <svg className="w-4 h-4 text-lime-500" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 text-lime-500"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
           </svg>
           <span>Your information is secure and encrypted</span>

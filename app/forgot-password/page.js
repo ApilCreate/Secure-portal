@@ -1,15 +1,14 @@
 'use client';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const res = await fetch('/api/forgot-password', {
@@ -22,13 +21,13 @@ export default function ForgotPasswordPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage(' Check your email for a reset link.');
+        toast.success(' Check your email for a reset link.');
         setEmail('');
       } else {
-        setMessage(` ${data.error}`);
+        toast.error(` ${data.error}`);
       }
     } catch (error) {
-      setMessage(' Something went wrong. Try again later.');
+      toast.error(' Something went wrong. Try again later.');
     }
 
     setLoading(false);
@@ -106,14 +105,6 @@ export default function ForgotPasswordPage() {
               Back to Sign In
             </a>
           </div>
-
-          {message && (
-            <div className="mt-6 p-4 bg-zinc-800 border border-zinc-700 rounded-xl">
-              <p className="text-center text-sm font-medium text-white">
-                {message}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Security Note */}
