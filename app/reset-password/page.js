@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import jwtDecode from "jwt-decode";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -52,6 +53,37 @@ export default function ResetPasswordPage() {
       };
   };
 
+  const [isTokenExpired, setIsTokenExpired] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      setIsTokenExpired(true);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const now = Date.now() / 1000; // in seconds
+      if (decoded.exp < now) {
+        setIsTokenExpired(true);
+      }
+
+      // Setup auto-expiry listener (real-time blank screen if user waits too long)
+      const timeLeft = (decoded.exp - now) * 1000;
+      const timeout = setTimeout(() => {
+        setIsTokenExpired(true);
+      }, timeLeft);
+
+      return () => clearTimeout(timeout);
+    } catch (error) {
+      setIsTokenExpired(true);
+    }
+  }, [token]);
+  setTimeout(() => {
+    toast.error("Reset link expired. Please request a new one.");
+    setIsTokenExpired(true);
+  }, timeLeft);
+
   const passwordsMatch = confirm && password === confirm;
   const passwordStrength = password ? getPasswordStrength(password) : null;
 
@@ -93,7 +125,22 @@ export default function ResetPasswordPage() {
     setLoading(false);
   };
 
-  return (
+  return isTokenExpired ? (
+    <div className="min-h-screen flex items-center justify-center text-white text-center bg-black">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Reset Link Expired</h2>
+        <p className="text-gray-400">
+          Please request a new password reset link.
+        </p>
+        <button
+          onClick={() => router.push("/forgot-password")}
+          className="bg-lime-500 text-black px-4 py-2 rounded hover:bg-lime-400"
+        >
+          Request New Link
+        </button>
+      </div>
+    </div>
+  ) : (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex flex-col items-center justify-center p-4 space-y-8">
       <Toaster position="top-center" />
 

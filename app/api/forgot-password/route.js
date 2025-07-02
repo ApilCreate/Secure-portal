@@ -15,7 +15,7 @@ export async function POST(request) {
     });
 
     if (!user) {
-      return new Response(JSON.stringify({ error: "No account with that email." }), { status: 404 });
+      return new Response(JSON.stringify({ error: "No account found with that email." }), { status: 404 });
     }
 
     // Generate token valid for 15 minutes

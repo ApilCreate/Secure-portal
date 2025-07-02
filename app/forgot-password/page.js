@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -35,6 +35,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex items-center justify-center p-4">
+      <Toaster position="top-center" />
 
       <div className="w-full max-w-md">
         {/* Header */}

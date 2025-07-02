@@ -173,6 +173,8 @@ http://localhost:3000
 - npm install nodemailer
 - npm install date-fns 
 - npm install qrcode
+- npm install jwt-decode
+
 
 # 12. NPX Commands
 

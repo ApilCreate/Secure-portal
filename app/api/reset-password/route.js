@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { logActivity } from "@/lib/logActivity"; // Import the logger
+import { logActivity } from "@/lib/logActivity";
 
 export async function POST(request) {
   try {
@@ -30,28 +30,44 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "User not found." }), { status: 404 });
     }
 
-    // Check against old password hashes
-    const oldHashes = await prisma.passwordHistory.findMany({
+    // Check against last 3 password hashes
+    const oldPasswords = await prisma.passwordHistory.findMany({
       where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 3,
     });
 
-    for (const entry of oldHashes) {
+    for (const entry of oldPasswords) {
       const match = await bcrypt.compare(password, entry.hash);
       if (match) {
         return new Response(
-          JSON.stringify({ error: " Please choose a different password — reuse not allowed." }),
+          JSON.stringify({ error: "Please choose a different password — reuse not allowed." }),
           { status: 400 }
         );
       }
     }
 
-    // Store current password hash in history
+    // Store current password in history before updating
     await prisma.passwordHistory.create({
       data: {
         userId,
-        hash: user.password, // Store old password
+        hash: user.password,
       },
     });
+
+    // Clean up older password entries (keep only last 3)
+    const allEntries = await prisma.passwordHistory.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      skip: 3,
+    });
+
+    const oldIds = allEntries.map((entry) => entry.id);
+    if (oldIds.length > 0) {
+      await prisma.passwordHistory.deleteMany({
+        where: { id: { in: oldIds } },
+      });
+    }
 
     // Hash and update new password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -69,7 +85,6 @@ export async function POST(request) {
     await logActivity(userId, "Reset Password");
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
-
   } catch (error) {
     console.error("Reset password error:", error);
     return new Response(JSON.stringify({ error: "Server error." }), { status: 500 });
