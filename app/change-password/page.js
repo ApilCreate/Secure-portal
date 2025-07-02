@@ -161,7 +161,11 @@ export default function ChangePasswordPage() {
         setToken("");
         setTimeout(() => router.push("/account"), 1000);
       } else {
-        toast.error(data.error || "Password change failed");
+        if (data.error?.includes("twice a day")) {
+          toast.error("Password change limit reached. Try again tomorrow.");
+        } else {
+          toast.error(data.error || "Password change failed");
+        }
       }
     } catch (err) {
       toast.error("Server error. Try again.");
