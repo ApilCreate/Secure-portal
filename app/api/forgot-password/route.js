@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 
+
 export async function POST(request) {
   try {
     const { email } = await request.json();

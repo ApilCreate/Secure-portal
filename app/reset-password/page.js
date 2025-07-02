@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import jwtDecode from "jwt-decode";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { logActivity } from "@/lib/logActivity";
 
+
 export async function POST(request) {
   try {
     const { token, password } = await request.json();
