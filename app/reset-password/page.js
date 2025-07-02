@@ -56,33 +56,31 @@ export default function ResetPasswordPage() {
   const [isTokenExpired, setIsTokenExpired] = useState(false);
 
   useEffect(() => {
-    if (!token) {
+  if (!token) {
+    setIsTokenExpired(true);
+    return;
+  }
+
+  try {
+    const decoded = jwtDecode(token);
+    const now = Date.now() / 1000; // in seconds
+    if (decoded.exp < now) {
       setIsTokenExpired(true);
       return;
     }
 
-    try {
-      const decoded = jwtDecode(token);
-      const now = Date.now() / 1000; // in seconds
-      if (decoded.exp < now) {
-        setIsTokenExpired(true);
-      }
-
-      // Setup auto-expiry listener (real-time blank screen if user waits too long)
-      const timeLeft = (decoded.exp - now) * 1000;
-      const timeout = setTimeout(() => {
-        setIsTokenExpired(true);
-      }, timeLeft);
-
-      return () => clearTimeout(timeout);
-    } catch (error) {
+    const timeLeft = (decoded.exp - now) * 1000;
+    const timeout = setTimeout(() => {
+      toast.error("Reset link expired. Please request a new one.");
       setIsTokenExpired(true);
-    }
-  }, [token]);
-  setTimeout(() => {
-    toast.error("Reset link expired. Please request a new one.");
+    }, timeLeft);
+
+    return () => clearTimeout(timeout);
+  } catch (error) {
     setIsTokenExpired(true);
-  }, timeLeft);
+  }
+}, [token]);
+
 
   const passwordsMatch = confirm && password === confirm;
   const passwordStrength = password ? getPasswordStrength(password) : null;
