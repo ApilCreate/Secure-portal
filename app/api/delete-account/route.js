@@ -11,7 +11,6 @@ export async function POST(request) {
     if (!userId) {
       return new Response(JSON.stringify({ error: "Missing user ID" }), { status: 400 });
     }
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -49,13 +48,10 @@ export async function POST(request) {
         return new Response(JSON.stringify({ error: "Invalid 2FA code" }), { status: 401 });
       }
     }
-
     // Log activity BEFORE deletion
     await logActivity(userId, 'Deleted Account');
-
     // Send confirmation email
     await sendAccountDeletionEmail(user.email, user.username);
-
     // Delete the user
     await prisma.user.delete({
       where: { id: userId },

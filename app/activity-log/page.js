@@ -126,7 +126,7 @@ export default function ActivityLogPage() {
         >
           <span className="flex items-center space-x-2">
             <ArrowLeft size={20} />
-            <span>Back to Dashboard</span>
+            <span>Back</span>
           </span>
         </button>
 
