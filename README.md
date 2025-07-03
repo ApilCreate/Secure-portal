@@ -1,104 +1,106 @@
-### Secure Portal
+# **Secure Portal**
 
-This project is a  modern, secure authentication portal built with Next.js, Prisma, and SQLite, featuring advanced security measures such as Two-Factor Authentication (2FA), OTP-based Email verification, Realtime Email Notification, Google reCAPTCHA, and account lockout. The application provides a responsive, dark-themed user interface with a glassmorphism design and animated background, ensuring an engaging user experience along with all the security assuring features.
+A modern, secure authentication portal built with **Next.js**, **Prisma**, and **SQLite**. Featuring advanced security with Two-Factor Authentication (2FA), OTP-based email verification, Google reCAPTCHA, and more. Enjoy a responsive, dark-themed UI with glassmorphism design and animated backgrounds.
 
-### Table of Contents
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2E3440?logo=prisma)](https://www.prisma.io/)
 
-- Project Overview
-- Features
-- Technologies Used
-- Utilities
-- Getting Started
-- Prerequisites
-- Environment Configuration
-- Running the Application
-- Project Structure
-- Security Features
-- NPM Packages
-- NPX Commands
+## **Table of Contents**
 
-# 1. Project Overview
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Utilities](#utilities)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Configuration](#environment-configuration)
+  - [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [Security Features](#security-features)
+- [NPM Packages](#npm-packages)
+- [NPX Commands](#npx-commands)
 
-The Secure Auth Portal is a full-stack web application designed to provide a robust and user-friendly authentication system. It incorporates industry-standard security practices to protect user data and prevent unauthorized access. The project is designed demonstrating proficiency in modern web development, security implementation, and responsive UI design.
+## **Project Overview**
 
-Key highlights:
+Secure Portal is a full-stack web application delivering a robust and user-friendly authentication system. It combines industry-standard security practices with a sleek, responsive UI. Built with modern web technologies, it showcases secure authentication workflows and a visually engaging glassmorphism design.
 
-- Registration with OTP-based email verification
-- 2 Factor Authentication (2FA) using Time-Based One-Time Passwords (TOTP)
-- Google reCAPTCHA v2 to prevent bot registrations
-- Account lockout after multiple failed login attempts
-- Activity logging for tracking user actions with Email notification
-- Responsive UI with Tailwind CSS and glassmorphism design
+**Key Highlights:**
+- OTP-based email verification for registration
+- Two-Factor Authentication (TOTP-based)
+- Google reCAPTCHA v2 for bot protection
+- Account lockout after failed login attempts
+- Real-time activity logging and email notifications
+- Dark-themed, responsive UI with animations
 
-# 2. Features
+## **Features**
 
-- User Registration: Secure sign-up with OTP email verification to ensure valid email addresses.
-- User Login: Optional 2FA with TOTP for enhanced security.
-- Password Reset: Includes strength validation and matching checks.
-- Account Deletion: Requires password or 2FA confirmation, followed by a confirmation email.
-- Google reCAPTCHA: Protects against automated bot registrations.
-- Password Strength Meter: Visual feedback for password complexity.
-- Activity Log: Tracks user actions (login, logout, password changes, 2FA events) and sends email if any changes made.
-- Account Lockout: Temporarily locks accounts after consecutive failed login attempts with a countdown timer.
-- Password Visibility Toggle: Enhances user experience on password inputs.
-- Toast Notifications: Provides real-time feedback for user actions.
-- Responsive Design: Dark-themed UI with animated backgrounds and glassmorphism effects.
+- **User Registration**: OTP-based email verification
+- **User Login**: Optional 2FA with TOTP
+- **Password Reset**: Strength validation and match check
+- **Account Deletion**: Password or 2FA confirmation with email
+- **Bot Protection**: Google reCAPTCHA v2
+- **Password Strength Meter**: Visual feedback for secure passwords
+- **Activity Log**: Tracks login, logout, and security events
+- **Account Lockout**: Locks after 5 failed attempts (15-min cooldown)
+- **UI Enhancements**: Password visibility toggle, real-time toast notifications
+- **Responsive Design**: Dark-themed UI with glassmorphism and animations
 
-# 3. Technologies Used
+## **Technologies Used**
 
-i. Frontend:
+### Frontend
+- **Next.js 14** (App Router)
+- **React**
+- **Tailwind CSS**
+- **Lucide React** (Icons)
+- **react-hot-toast**
+- **react-google-recaptcha**
 
-- Next.js 14 (App Router)
-- React
-- Tailwind CSS
-- Lucide React (Icons)
-- react-hot-toast (Notifications)
-- react-google-recaptcha (CAPTCHA)
+### Backend
+- **Node.js**
+- **Prisma ORM**
+- **SQLite** (supports PostgreSQL/MySQL)
 
-ii. Backend:
+### Security
+- **bcryptjs**: Password hashing
+- **speakeasy**: TOTP-based 2FA
+- **Nodemailer**: Email notifications (SMTP via Gmail)
+- **qrcode**: QR code generation for 2FA
 
-- Node.js
-- Prisma ORM
-- SQLite (configurable for PostgreSQL, MySQL, etc.)
+## **Utilities**
+- **date-fns**: Date manipulation
+- **PostCSS & Autoprefixer**: CSS processing
 
-iii. Security:
+## **Getting Started**
 
-- bcryptjs (Password hashing)
-- speakeasy (TOTP for 2FA)
-- Nodemailer (Email service via Gmail SMTP)
-- qrcode (QR code generation for 2FA setup)
+Follow these steps to set up and run Secure Portal locally.
 
+### Prerequisites
+- **Node.js**: v18 or higher
+- **npm**: v9 or higher
+- **Gmail Account**: For Nodemailer (App Password required)
+- **Google reCAPTCHA v2**: Site Key and Secret Key
 
-# 4. Utilities:
+### Installation
+1. Open the file:
+   ```bash
+   cd secure-portal
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Initialize Prisma:
+   ```bash
+   npx prisma init
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
 
-- date-fns (Date manipulation)
-- PostCSS & Autoprefixer (CSS processing)
+### Environment Configuration
+Create a `.env` file in the root directory with the following:
 
-
-# 5. Getting Started
-Follow these steps to set up and run the project locally.
-
-# Prerequisites
-
-- Node.js (v18 or higher)
-- npm (v9 or higher)
-- A Gmail account for Nodemailer (with an App Password for SMTP)
-- Google reCAPTCHA API keys (Site Key and Secret Key)
-
-# 6. Install dependencies:
-- Open the folder inside your IDE and open terminal.
-- Type cd secure-portal
-- Type npm install
-
-# Initialize Prisma:
-- npx prisma init
-- npx prisma migrate dev --name init
-- npx prisma generate
-
-
-# 7. Environment Configuration
-- Create a .env file in the root directory and add the following variables:
-
+```bash
 DATABASE_URL="file:./dev.db"
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
 RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
@@ -106,84 +108,82 @@ EMAIL_USER=your-gmail-address@gmail.com
 EMAIL_PASS=your-gmail-app-password
 EMAIL_FROM="Secure Portal <your-gmail-address@gmail.com>"
 JWT_SECRET=your-32-character-jwt-secret
+```
 
+Replace placeholders with your actual values.
 
-- Replace your-recaptcha-site-key and your-recaptcha-secret-key with your Google reCAPTCHA v2 keys.
-- Replace your-gmail-address@gmail.com and your-gmail-app-password with your Gmail credentials. Generate an App Password from your Google Account settings.
-- Generate a secure JWT_SECRET (e.g., using a random string generator).
+### Running the Application
+1. Start the development server:
+   ```bash
+   npm run dev
+   ```
+2. View the database in real-time:
+   ```bash
+   npx prisma studio
+   ```
+3. Or, import `prisma/dev.db` into SQLite.
+4. Open the app at: [http://localhost:3000](http://localhost:3000)
 
-# 8. Running the Application
+## **Project Structure**
 
-Start the development server:
-- Type npm run dev
+```plaintext
+├── app/              # Next.js App Router pages and API routes
+├── components/       # Reusable React components
+├── lib/              # Utility functions and configurations
+├── prisma/           # Prisma schema and migrations
+├── public/           # Static assets (images, fonts, etc.)
+├── styles/           # Global CSS and Tailwind configs
+├── .env              # Environment variables
+├── package.json      # Project dependencies and scripts
+├── readme.md         # Project documentation
+```
 
-To See realtime database:
-- Type npx prisma studio
+## **Security Features**
+- **Password Hashing**: bcryptjs
+- **2FA**: TOTP via speakeasy
+- **OTP Email Verification**: Secure registration
+- **Google reCAPTCHA v2**: Bot protection
+- **Account Lockout**: 5 failed attempts trigger 15-minute lock
+- **JWT Authentication**: Secure API routes
+- **Activity Logging**: Tracks key user actions in the database
 
-Or
-
-Import prisma/dev.db file inside SQLite
-
-
-# Open the application in your browser:
-
-http://localhost:3000
-
-
-# 9. Project Structure
-
-├── app/                    - Next.js App Router pages and API routes
-├── components/             - Reusable React components
-├── lib/                    - Utility functions and configurations
-├── prisma/                 - Prisma schema and migrations
-├── public/                 - Static assets (images, fonts, etc.)
-├── styles/                 - Global CSS and Tailwind configurations
-├── .env                    - Environment variables
-├── package.json            - Project dependencies and scripts
-├── README.md               - Project documentation
-
-# 10. Security Features
-- Password Hashing: Uses bcryptjs for secure password storage.
-- 2FA: Implements TOTP with speakeasy for optional two-factor authentication.
-- OTP Verification: Sends one-time passwords via email for registration.
-- CAPTCHA: Integrates Google reCAPTCHA v2 to prevent bot registrations.
-- Account Lockout: Locks accounts after 5 failed login attempts for 15 minutes.
-- JWT Authentication: Secures API routes with JSON Web Tokens.
-- Activity Logging: Records user actions in the database for auditing.
-
-# 11. NPM Packages
+## **NPM Packages**
 
 ### Runtime & Framework
-- npm install next react react-dom
+```bash
+npm install next react react-dom
+```
 
 ### Styling & UI
-- npm install tailwindcss postcss autoprefixer 
-- npm install lucide-react 
-- npm install react-hot-toast 
-- npm install react-google-recaptcha
+```bash
+npm install tailwindcss postcss autoprefixer
+npm install three vanta
+npm install lucide-react react-hot-toast react-google-recaptcha
+```
 
 ### Database & ORM
-- npm install @prisma/client
-- npm install prisma --save-dev
-- npm install sqlite3
+```bash
+npm install @prisma/client prisma --save-dev sqlite3
+```
 
 ### Authentication & Security
-- npm install bcryptjs
-- npm install speakeasy 
-- npm install nodemailer
-- npm install date-fns 
-- npm install qrcode
-- npm install jwt-decode
+```bash
+npm install bcryptjs speakeasy nodemailer date-fns qrcode jwt-decode
+```
 
+## **NPX Commands**
 
-# 12. NPX Commands
+### Initialize Prisma
+```bash
+npx prisma init
+```
 
-# Initialize Prisma:
-- npx prisma init
+### Apply Migrations
+```bash
+npx prisma migrate dev --name init
+```
 
-# Apply migrations:
-- npx prisma migrate dev --name init
-
-# Generate Prisma client:
-- npx prisma generate
-
+### Generate Prisma Client
+```bash
+npx prisma generate
+```

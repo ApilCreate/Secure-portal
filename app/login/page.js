@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import VantaGlobe from "@/lib/VantaGlobe";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -135,8 +136,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px] bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen [background-size:20px_20px] flex items-center justify-center p-4">
+      <VantaGlobe />
       <Toaster position="top-center" />
+
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
@@ -155,17 +158,19 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-semibold text-white mb-2">
-            {step === 1 ? "Welcome Back" : "Verify Identity"}
-          </h1>
-          <p className="text-slate-400 text-base">
-            {step === 1
-              ? "Sign in to your account"
-              : "Enter your 2FA code to continue"}
-          </p>
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-4 max-w-md w-full space-y-6">
+            <h1 className="text-3xl font-semibold text-white mb-2">
+              {step === 1 ? "Welcome Back" : "Verify Identity"}
+            </h1>
+            <p className="text-slate-400 text-base">
+              {step === 1
+                ? "Sign in to your account"
+                : "Enter your 2FA code to continue"}
+            </p>
+          </div>
         </div>
 
-        <div className="bg-zinc-900 p-8 rounded-2xl shadow-2xl">
+        <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 max-w-md w-full space-y-6">
           {step === 1 ? (
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-5">
