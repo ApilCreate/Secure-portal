@@ -110,7 +110,7 @@ EMAIL_FROM="Secure Portal <your-gmail-address@gmail.com>"
 JWT_SECRET=your-32-character-jwt-secret
 ```
 
-Replace placeholders with your actual values.
+Replace placeholders with actual values.
 
 ### Running the Application
 1. Start the development server:
@@ -151,24 +151,38 @@ Replace placeholders with your actual values.
 
 ### Runtime & Framework
 ```bash
-npm install next react react-dom
+npm install next
+npm install react
+npm install react-dom
 ```
 
 ### Styling & UI
 ```bash
-npm install tailwindcss postcss autoprefixer
-npm install three vanta
-npm install lucide-react react-hot-toast react-google-recaptcha
+npm install tailwindcss
+npm install postcss
+npm install autoprefixer
+npm install three
+npm install vanta
+npm install lucide-react
+npm install react-hot-toast
+npm install react-google-recaptcha
 ```
 
 ### Database & ORM
 ```bash
-npm install @prisma/client prisma --save-dev sqlite3
+npm install @prisma/client
+npm install prisma --save-dev
+npm install sqlite3
 ```
 
 ### Authentication & Security
 ```bash
-npm install bcryptjs speakeasy nodemailer date-fns qrcode jwt-decode
+npm install bcryptjs
+npm install speakeasy
+npm install nodemailer
+npm install date-fns
+npm install qrcode
+npm install jwt-decode
 ```
 
 ## **NPX Commands**
