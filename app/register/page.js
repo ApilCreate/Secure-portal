@@ -2,7 +2,83 @@
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import ReCAPTCHA from "react-google-recaptcha";
-import VantaGlobe from "@/lib/VantaGlobe";
+
+function RegisterBackground() {
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[#03060a]">
+      {/* Base gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#03060a] via-[#040a06] to-[#020302]" />
+
+      {/* Large aurora glows */}
+      <div className="register-bg-aurora-1 absolute -left-[20%] -top-[15%] h-[800px] w-[800px] rounded-full bg-[radial-gradient(circle,rgba(163,230,53,0.22),transparent_65%)] blur-[100px]" />
+      <div className="register-bg-aurora-2 absolute -right-[20%] top-[0%] h-[750px] w-[750px] rounded-full bg-[radial-gradient(circle,rgba(34,211,153,0.18),transparent_65%)] blur-[110px]" />
+      <div className="register-bg-aurora-3 absolute left-[30%] -bottom-[30%] h-[700px] w-[700px] rounded-full bg-[radial-gradient(circle,rgba(132,204,22,0.16),transparent_65%)] blur-[120px]" />
+
+      {/* Glow directly behind the card */}
+      <div className="absolute left-1/2 top-[45%] h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(190,255,150,0.14),transparent_70%)] blur-[80px]" />
+
+      {/* Perspective grid floor */}
+      <div
+        className="register-bg-grid absolute -bottom-[15%] -left-[25%] h-[55%] w-[150%]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(163,230,53,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(163,230,53,0.35) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          transform: "perspective(500px) rotateX(62deg)",
+          transformOrigin: "bottom",
+          maskImage: "linear-gradient(to top, black 20%, transparent 90%)",
+          WebkitMaskImage: "linear-gradient(to top, black 20%, transparent 90%)",
+        }}
+      />
+
+      {/* Floating particles */}
+      <div className="register-bg-particle absolute left-[15%] top-[20%] h-1.5 w-1.5 rounded-full bg-lime-300 shadow-[0_0_14px_4px_rgba(163,230,53,0.7)]" />
+      <div className="register-bg-particle absolute right-[18%] top-[30%] h-1 w-1 rounded-full bg-emerald-300 shadow-[0_0_12px_3px_rgba(52,211,153,0.6)]" style={{ animationDelay: "1.5s" }} />
+      <div className="register-bg-particle absolute left-[25%] bottom-[35%] h-1 w-1 rounded-full bg-lime-200 shadow-[0_0_10px_3px_rgba(190,255,150,0.6)]" style={{ animationDelay: "3s" }} />
+      <div className="register-bg-particle absolute right-[28%] bottom-[22%] h-1.5 w-1.5 rounded-full bg-lime-400 shadow-[0_0_14px_4px_rgba(163,230,53,0.6)]" style={{ animationDelay: "2s" }} />
+      <div className="register-bg-particle absolute right-[10%] top-[60%] h-1 w-1 rounded-full bg-emerald-200 shadow-[0_0_10px_3px_rgba(110,231,183,0.5)]" style={{ animationDelay: "0.8s" }} />
+
+      {/* Film grain */}
+      <div
+        className="absolute inset-0 opacity-[0.05] mix-blend-soft-light"
+        style={{
+          backgroundImage:
+            "url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27200%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E')",
+          backgroundSize: "180px 180px",
+        }}
+      />
+
+      {/* Edge hairline */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lime-400/40 to-transparent" />
+
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.6)_100%)]" />
+
+      <style>{`
+        @keyframes drift-1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(80px, 50px) scale(1.1); }
+        }
+        @keyframes drift-2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-70px, 40px) scale(1.08); }
+        }
+        @keyframes drift-3 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(50px, -60px) scale(1.12); }
+        }
+        @keyframes particle-float {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+          50% { transform: translateY(-18px) scale(1.4); opacity: 1; }
+        }
+        .register-bg-aurora-1 { animation: drift-1 24s ease-in-out infinite; }
+        .register-bg-aurora-2 { animation: drift-2 28s ease-in-out infinite; }
+        .register-bg-aurora-3 { animation: drift-3 32s ease-in-out infinite; }
+        .register-bg-particle { animation: particle-float 6s ease-in-out infinite; }
+      `}</style>
+    </div>
+  );
+}
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -186,10 +262,8 @@ export default function RegisterPage() {
     : null;
 
   return (
-    <div className="min-h-screen [background-size:20px_20px] flex items-center justify-center p-4">
-      <VantaGlobe />
-      {/* Background pattern */}
-      <div className="absolute inset-0 "></div>
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center p-4">
+      <RegisterBackground />
       <Toaster position="top-center" />
 
       <div className="relative w-full max-w-md">

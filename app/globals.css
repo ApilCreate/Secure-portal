@@ -24,6 +24,52 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@keyframes register-bg-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -20px) scale(1.04);
+  }
+}
+
+@keyframes register-bg-float-reverse {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-20px, 16px) scale(0.96);
+  }
+}
+
+@keyframes register-bg-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.register-bg-orb-1 {
+  animation: register-bg-float 14s ease-in-out infinite;
+}
+
+.register-bg-orb-2 {
+  animation: register-bg-float-reverse 18s ease-in-out infinite;
+}
+
+.register-bg-orb-3 {
+  animation: register-bg-float 22s ease-in-out infinite reverse;
+}
+
+.register-bg-glow {
+  animation: register-bg-glow 8s ease-in-out infinite;
+}
+
 .btn-shimmer {
   position: relative;
   overflow: hidden;
