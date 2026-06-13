@@ -35,7 +35,7 @@ export default function AccountPage() {
     } finally {
       setTimeout(() => setIsLoading(false), 300);
     }
-  }, []);
+  }, [router]);
 
   const handleDisable2FA = async () => {
     setModalMessage("");

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -184,7 +185,7 @@ export default function TwoFactorSetupPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lime-200 font-semibold text-sm mb-1">What you'll need:</h3>
+                  <h3 className="text-lime-200 font-semibold text-sm mb-1">What you&apos;ll need:</h3>
                   <p className="text-slate-300 text-sm leading-relaxed">
                     An authenticator app like <span className="text-lime-400 font-medium">Google Authenticator</span>, <span className="text-lime-400 font-medium">Authy</span>, or <span className="text-lime-400 font-medium">Microsoft Authenticator</span> installed on your phone.
                   </p>
@@ -214,9 +215,12 @@ export default function TwoFactorSetupPage() {
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-4">
               <div className="inline-block p-4 bg-white rounded-2xl shadow-lg border-2 border-lime-400/30">
-                <img
+                <Image
                   src={qrCode}
                   alt="QR Code for 2FA setup"
+                  width={192}
+                  height={192}
+                  unoptimized
                   className="w-48 h-48 mx-auto rounded-lg"
                 />
               </div>
