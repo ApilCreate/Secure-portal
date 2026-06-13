@@ -281,7 +281,7 @@ export default function LoginPage() {
                 {/*  CAPTCHA Below Password */}
                 <div className="pt-2 flex justify-center items-center">
                   <ReCAPTCHA
-                    sitekey="6Lde82orAAAAAA-iEZNe2HKU2GNEwPUqnqutcKt8"
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                     onChange={handleCaptchaChange}
                     theme="dark"
                   />
