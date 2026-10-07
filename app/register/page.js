@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -92,6 +92,7 @@ export default function RegisterPage() {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const captchaRef = useRef(null);
 
   console.log("CAPTCHA token sending to server:", captchaToken);
 
@@ -191,12 +192,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
 
-    if (!captchaToken) {
-      toast.error(" Please complete the CAPTCHA.");
-      setLoading(false);
-      return;
-    }
-
     if (!isOtpSent) {
       try {
         const res = await fetch("/api/send-otp", {
@@ -228,6 +223,12 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!captchaToken) {
+      toast.error("Please complete the CAPTCHA before creating your account.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -248,6 +249,8 @@ export default function RegisterPage() {
         setEmailVerified(false);
       } else {
         toast.error(` ${data.error || "Registration failed"}`);
+        captchaRef.current?.reset();
+        setCaptchaToken(null);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -500,14 +503,17 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-center py-2">
-              <ReCAPTCHA
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                onChange={(token) => setCaptchaToken(token)}
-                theme="dark"
-              />
-            </div>
+            {/* reCAPTCHA — shown only after email is verified so token stays fresh */}
+            {emailVerified && (
+              <div className="flex justify-center py-2">
+                <ReCAPTCHA
+                  ref={captchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                  theme="dark"
+                />
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
@@ -522,7 +528,13 @@ export default function RegisterPage() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <span>Create Account</span>
+                  <span>
+                    {!isOtpSent
+                      ? "Send OTP"
+                      : !emailVerified
+                        ? "Verify OTP First"
+                        : "Create Account"}
+                  </span>
                   <svg
                     className="w-4 h-4"
                     fill="none"

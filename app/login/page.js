@@ -2,7 +2,7 @@
 
 import VantaGlobe from "@/lib/VantaGlobe";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [remainingTime, setRemainingTime] = useState(null);
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const captchaRef = useRef(null);
 
   useEffect(() => {
     let interval;
@@ -87,6 +88,8 @@ export default function LoginPage() {
         }
       } else {
         toast.error(data.error || "Login failed");
+        captchaRef.current?.reset();
+        setRecaptchaToken("");
 
         if (data.attemptsLeft !== undefined) {
           toast(`Attempts left: ${data.attemptsLeft}`, { icon: "⚠️" });
@@ -281,6 +284,7 @@ export default function LoginPage() {
                 {/*  CAPTCHA Below Password */}
                 <div className="pt-2 flex justify-center items-center">
                   <ReCAPTCHA
+                    ref={captchaRef}
                     sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                     onChange={handleCaptchaChange}
                     theme="dark"
