@@ -31,18 +31,6 @@ export async function POST(request) {
       );
     }
 
-    // Debugging logs
-    console.log("🔐 DEBUG: Verifying 2FA");
-    console.log("👉 userId:", userId);
-    console.log("👉 token entered:", token);
-    console.log("👉 stored secret:", user.twoFactorSecret);
-
-    const expected = speakeasy.totp({
-      secret: user.twoFactorSecret,
-      encoding: "base32"
-    });
-    console.log("👉 expected token (current):", expected);
-
     const isVerified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: "base32",

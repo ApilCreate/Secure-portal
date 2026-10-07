@@ -94,8 +94,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const captchaRef = useRef(null);
 
-  console.log("CAPTCHA token sending to server:", captchaToken);
-
   // Password strength checker
   const getPasswordStrength = (password) => {
     let strength = 0;

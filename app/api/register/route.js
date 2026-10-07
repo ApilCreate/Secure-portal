@@ -6,8 +6,6 @@ export async function POST(request) {
   try {
     const { username, email, password, captchaToken } = await request.json();
 
-    console.log("Received captchaToken on server:", captchaToken);
-
     if (!captchaToken) {
       return new Response(JSON.stringify({ error: "Captcha is required" }), { status: 400 });
     }
