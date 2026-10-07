@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import nodemailer from "nodemailer";
+import { sendEmail } from "@/lib/mailer";
 import { addMinutes } from "date-fns";
 
 export async function POST(req) {
@@ -10,33 +10,21 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Email is required" }), { status: 400 });
     }
 
-    // Block if user already registered
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return new Response(JSON.stringify({ error: "User already registered with this email" }), { status: 400 });
     }
 
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = addMinutes(new Date(), 10);
 
-    // Temporarily store OTP in a "verification" table or a cache
     await prisma.emailVerification.upsert({
       where: { email },
       update: { otp, otpExpiry: expiry },
       create: { email, otp, otpExpiry: expiry },
     });
 
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
+    await sendEmail({
       to: email,
       subject: "Your OTP Code",
       html: `<p>Your OTP code is: <strong>${otp}</strong></p><p>This code will expire in 10 minutes.</p>`,

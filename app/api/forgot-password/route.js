@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
-import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
-
+import { sendEmail } from "@/lib/mailer";
 
 export async function POST(request) {
   try {
@@ -19,22 +18,16 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "No account found with that email." }), { status: 404 });
     }
 
-    // Generate token valid for 15 minutes
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
 
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const origin = request.headers.get("origin");
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      origin ||
+      "http://localhost:3000";
+    const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
-    // Send the email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    await sendEmail({
       to: email,
       subject: "Password Reset Request",
       html: `

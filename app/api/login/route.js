@@ -76,16 +76,20 @@ export async function POST(request) {
 
       // Send Email Notification on Lockout
       if (lockedUntil) {
-        await sendEmail({
-          to: existingUser.email,
-          subject: 'Account Locked Due to Failed Login Attempts',
-          html: `
+        try {
+          await sendEmail({
+            to: existingUser.email,
+            subject: 'Account Locked Due to Failed Login Attempts',
+            html: `
             <h2>Your account has been temporarily locked</h2>
             <p>We detected 5 consecutive failed login attempts to your account.</p>
             <p>As a security measure, your account is locked until <strong>${lockedUntil.toLocaleString()}</strong>.</p>
             <p>If this wasn't you, we recommend resetting your password.</p>
           `,
-        });
+          });
+        } catch (emailError) {
+          console.error('Lockout notification email failed:', emailError);
+        }
       }
 
       return new Response(JSON.stringify({
@@ -121,18 +125,22 @@ export async function POST(request) {
     // Log successful login
     await logActivity(existingUser.id, 'Login');
 
-    // Send Email Notification on Successful Login
-    await sendEmail({
-      to: existingUser.email,
-      subject: 'New Login Notification',
-      html: `
+    // Send Email Notification on Successful Login (non-blocking)
+    try {
+      await sendEmail({
+        to: existingUser.email,
+        subject: 'New Login Notification',
+        html: `
         <h2>New Login Detected</h2>
         <p>Your account was just accessed successfully.</p>
         <p>If this was you, no further action is needed. If not, please reset your password immediately.</p>
         <p><strong>Time:</strong> ${now.toLocaleString()}</p>
         <p><strong>Account:</strong> ${existingUser.email}</p>
       `,
-    });
+      });
+    } catch (emailError) {
+      console.error('Login notification email failed:', emailError);
+    }
 
     return new Response(JSON.stringify({
       success: true,
