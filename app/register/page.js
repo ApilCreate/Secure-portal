@@ -263,14 +263,37 @@ export default function RegisterPage() {
     : null;
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center p-4">
+    <div className="auth-shell relative flex min-h-screen items-center justify-center overflow-hidden p-4 sm:p-6">
       <RegisterBackground />
       <Toaster position="top-center" />
 
-      <div className="relative w-full max-w-md">
+      <div className="auth-v2-layout">
+        <aside className="auth-v2-aside">
+          <div>
+            <div className="auth-v2-eyebrow">Secure Portal / New Identity</div>
+            <div className="auth-brand-mark mt-8 inline-flex h-14 w-14 items-center justify-center rounded-2xl">
+              <svg className="h-7 w-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="mt-8 max-w-xs text-4xl font-semibold leading-tight tracking-tight text-white">
+              Make room for what matters.
+            </h2>
+            <p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">
+              Create one protected identity for your account, activity, and future access.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="auth-v2-feature">Email ownership verification</div>
+            <div className="auth-v2-feature">Password strength guidance</div>
+            <div className="auth-v2-feature">Protected sign-in recovery</div>
+          </div>
+        </aside>
+        <main className="auth-v2-content">
+        <div className="relative w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 rounded-xl mb-6">
+        <div className="mb-6 text-center">
+          <div className="auth-brand-mark mx-auto mb-5 inline-flex h-16 w-16 items-center justify-center rounded-3xl">
             <svg
               className="w-8 h-8 text-black"
               fill="none"
@@ -285,18 +308,21 @@ export default function RegisterPage() {
               />
             </svg>
           </div>
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-4 max-w-md w-full space-y-6">
-            <h1 className="text-3xl font-bold text-white mb-2">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-lime-300/80">
+              Secure Portal
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">
               Create Account
             </h1>
-            <p className="text-gray-400 text-sm">
+            <p className="text-sm text-gray-400">
               Enter your details to get started
             </p>
           </div>
         </div>
 
         {/* Form Card */}
-        <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 max-w-md w-full space-y-6">
+        <div className="auth-card relative w-full max-w-md rounded-3xl p-6 sm:p-8">
           <div className="space-y-6">
             {/* Username Field */}
             <div>
@@ -325,7 +351,7 @@ export default function RegisterPage() {
                   value={formData.username}
                   onChange={handleChange}
                   placeholder="Username"
-                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  className="auth-input w-full rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 outline-none transition-all"
                   required
                 />
               </div>
@@ -358,7 +384,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email"
-                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  className="auth-input w-full rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 outline-none transition-all"
                   required
                 />
               </div>
@@ -392,7 +418,7 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                   onChange={handleChange}
                   placeholder="Password"
-                  className="w-full pl-12 pr-10 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  className="auth-input w-full rounded-xl py-3 pl-12 pr-10 text-white placeholder-slate-500 outline-none transition-all"
                   required
                 />
                 <button
@@ -478,7 +504,7 @@ export default function RegisterPage() {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="6-digit code"
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white"
+                  className="auth-input w-full rounded-xl px-4 py-3 text-white outline-none transition-all"
                 />
 
                 {/* Verify + Resend Buttons side by side */}
@@ -486,14 +512,14 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={verifyOtp}
-                    className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3 rounded-lg text-sm transition-colors duration-200"
+                    className="auth-button w-full rounded-xl py-3 text-sm font-semibold text-black"
                   >
                     Verify OTP
                   </button>
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    className="w-full py-3 bg-transparent border-lime-400 border-2 text-lime-400 hover:bg-lime-500 hover:text-black font-semibold rounded-lg text-sm transition-colors duration-200"
+                    className="w-full rounded-xl border border-lime-300/70 bg-transparent py-3 text-sm font-semibold text-lime-200 transition-colors hover:bg-lime-300 hover:text-black"
                   >
                     Resend OTP
                   </button>
@@ -517,7 +543,7 @@ export default function RegisterPage() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-2"
+              className="auth-button mt-2 flex w-full items-center justify-center rounded-xl py-3 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <div className="flex items-center space-x-2">
@@ -554,7 +580,7 @@ export default function RegisterPage() {
             <div className="text-center mt-2">
               <a
                 href="/login"
-                className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200"
+                className="auth-link text-sm underline underline-offset-4"
               >
                 Already have a account? Sign In
               </a>
@@ -573,6 +599,8 @@ export default function RegisterPage() {
           </svg>
           <span>Your information is secure and encrypted</span>
         </div>
+      </div>
+        </main>
       </div>
     </div>
   );

@@ -139,14 +139,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen [background-size:20px_20px] flex items-center justify-center p-4">
+    <div className="auth-shell flex items-center justify-center p-4 sm:p-6">
       <VantaGlobe />
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-md">
+      <div className="auth-v2-layout">
+        <aside className="auth-v2-aside">
+          <div>
+            <div className="auth-v2-eyebrow">Secure Portal / Access</div>
+            <div className="auth-brand-mark mt-8 inline-flex h-14 w-14 items-center justify-center rounded-2xl">
+              <svg className="h-7 w-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 className="mt-8 max-w-xs text-4xl font-semibold leading-tight tracking-tight text-white">
+              Your digital space, secured.
+            </h2>
+            <p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">
+              Sign in to continue to a private workspace built around your security.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="auth-v2-feature">Encrypted account access</div>
+            <div className="auth-v2-feature">Two-factor authentication ready</div>
+            <div className="auth-v2-feature">Real-time security alerts</div>
+          </div>
+        </aside>
+        <main className="auth-v2-content">
+        <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-400 rounded-3xl mb-6">
+        <div className="mb-6 text-center">
+          <div className="auth-brand-mark mx-auto mb-5 inline-flex h-16 w-16 items-center justify-center rounded-3xl">
             <svg
               className="w-8 h-8 text-black"
               fill="none"
@@ -161,11 +184,14 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-4 max-w-md w-full space-y-6">
-            <h1 className="text-3xl font-semibold text-white mb-2">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-lime-300/80">
+              Secure Portal
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
               {step === 1 ? "Welcome Back" : "Verify Identity"}
             </h1>
-            <p className="text-slate-400 text-base">
+            <p className="text-sm text-slate-400">
               {step === 1
                 ? "Sign in to your account"
                 : "Enter your 2FA code to continue"}
@@ -173,7 +199,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 max-w-md w-full space-y-6">
+        <div className="auth-card relative w-full max-w-md rounded-3xl p-6 sm:p-8">
           {step === 1 ? (
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-5">
@@ -192,7 +218,7 @@ export default function LoginPage() {
                     value={formData.user}
                     onChange={handleChange}
                     required
-                    className="w-full pl-4 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-transparent"
+                    className="auth-input w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -226,7 +252,7 @@ export default function LoginPage() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Password"
-                      className="w-full pl-12 pr-10 py-3 bg-zinc-800 text-white placeholder-slate-500 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 autofill:bg-zinc-800 autofill:text-white transition-all duration-200"
+                      className="auth-input w-full rounded-xl py-3 pl-12 pr-10 text-white placeholder-slate-500 outline-none transition-all autofill:bg-zinc-800 autofill:text-white"
                       required
                     />
                     <button
@@ -301,7 +327,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
+                className="auth-button w-full rounded-xl py-3.5 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
@@ -323,13 +349,13 @@ export default function LoginPage() {
                   value={formData.token}
                   onChange={handleChange}
                   required
-                  className="w-full pl-12 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400 text-white placeholder-slate-500 transition-all duration-200"
+                  className="auth-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none transition-all"
                 />
               </div>
               <button
                 onClick={handle2FAVerify}
                 disabled={loading}
-                className="w-full bg-lime-400 hover:bg-lime-500 text-black font-semibold py-3.5 rounded-xl"
+                className="auth-button w-full rounded-xl py-3.5 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Verifying..." : "Verify Code"}
               </button>
@@ -339,7 +365,7 @@ export default function LoginPage() {
           <div className="text-center mt-6">
             <a
               href="/forgot-password"
-              className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200"
+              className="auth-link text-sm underline underline-offset-4"
             >
               Forgot your password?
             </a>
@@ -347,7 +373,7 @@ export default function LoginPage() {
           <div className="text-center mt-4">
             <a
               href="/register"
-              className="text-lime-500 underline underline-offset-2 hover:text-lime-400 text-sm transition-colors duration-200"
+              className="auth-link text-sm underline underline-offset-4"
             >
               No account? Sign up
             </a>
@@ -364,6 +390,8 @@ export default function LoginPage() {
           </svg>
           <span>Your information is secure and encrypted</span>
         </div>
+      </div>
+        </main>
       </div>
     </div>
   );
