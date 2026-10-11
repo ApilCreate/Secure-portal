@@ -7,8 +7,8 @@ CREATE TABLE "User" (
     "passwordHistory" TEXT NOT NULL DEFAULT '[]',
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "loginAttempts" INTEGER NOT NULL DEFAULT 0,
-    "lockedUntil" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "lockedUntil" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateIndex

@@ -2,7 +2,7 @@
 
 A modern authentication portal built with Next.js, Prisma, and SQLite, designed to demonstrate a complete and secure user authentication flow. It includes Two-Factor Authentication (2FA), OTP-based email verification, Google reCAPTCHA protection, account lockout safeguards, and a responsive dark-themed UI with glassmorphism styling and animated backgrounds.
 
-> **Vercel deployment note:** The default SQLite database is suitable for local development only. Vercel serverless functions do not provide persistent local disk storage, so configure `DATABASE_URL` to a hosted database and use a matching Prisma provider/migration before deploying. Do not deploy with `DATABASE_URL="file:./dev.db"` if data must persist.
+> **Vercel deployment note:** SQLite is suitable for local development only. Vercel serverless functions do not provide persistent local disk storage, so configure `DATABASE_URL` to a hosted database and use a matching Prisma provider/migration before deploying.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2E3440?logo=prisma)](https://www.prisma.io/)
@@ -117,7 +117,7 @@ Follow these steps to set up and run Secure Portal locally.
 Create a `.env` file in the root directory with the following variables:
 
 ```bash
-DATABASE_URL="file:./dev.db" # local development only; use a hosted database on Vercel
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
 RECAPTCHA_SITE_KEY=your-recaptcha-site-key
 RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
@@ -149,9 +149,7 @@ For Vercel, add these variables in the project settings instead of committing `.
    npx prisma studio
    ```
 
-3. Alternatively, open `prisma/dev.db` directly with any SQLite client.
-
-4. Open the application in your browser at [http://localhost:3000](http://localhost:3000)
+3. Open the application in your browser at [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
 
@@ -206,7 +204,6 @@ npm install react-google-recaptcha
 ```bash
 npm install @prisma/client
 npm install prisma --save-dev
-npm install sqlite3
 ```
 
 ### Authentication and Security
