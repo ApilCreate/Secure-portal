@@ -1,242 +1,232 @@
 # Secure Portal
 
-A modern authentication portal built with Next.js, Prisma, and SQLite, designed to demonstrate a complete and secure user authentication flow. It includes Two-Factor Authentication (2FA), OTP-based email verification, Google reCAPTCHA protection, account lockout safeguards, and a responsive dark-themed UI with glassmorphism styling and animated backgrounds.
+Secure Portal is a full-stack authentication application built with Next.js, Prisma, and PostgreSQL. It combines a security-focused authentication flow with a polished split-screen interface: a product-style security panel on desktop and a focused, responsive form experience on mobile.
 
-> **Vercel deployment note:** SQLite is suitable for local development only. Vercel serverless functions do not provide persistent local disk storage, so configure `DATABASE_URL` to a hosted database and use a matching Prisma provider/migration before deploying.
+The project supports email verification, password protection, optional TOTP two-factor authentication, CAPTCHA validation, account lockout safeguards, activity logging, and email notifications.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2E3440?logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql)](https://neon.tech/)
 
-## Table of Contents
+## Highlights
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Utilities](#utilities)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Configuration](#environment-configuration)
-  - [Running the Application](#running-the-application)
-- [Project Structure](#project-structure)
-- [Security Features](#security-features)
-- [NPM Packages](#npm-packages)
-- [NPX Commands](#npx-commands)
-- [Development Notes](#development-notes)
-
-## Project Overview
-
-Secure Portal is a full-stack web application that delivers a robust, user-friendly authentication system built on modern web technologies. It combines industry-standard security practices, such as password hashing, two-factor authentication, and bot protection, with a polished, responsive interface featuring a dark theme, glassmorphism design, and subtle animations.
-
-Key highlights include:
-
+- Responsive split-screen login and registration experience
+- Dark security-console visual language with lime/emerald accents
 - OTP-based email verification during registration
-- Optional Two-Factor Authentication using TOTP
-- Google reCAPTCHA v2 for bot protection
+- Optional TOTP two-factor authentication
+- Google reCAPTCHA protection for authentication flows
+- Password strength feedback and password visibility controls
 - Account lockout after repeated failed login attempts
-- Real-time activity logging and email notifications
-- A dark-themed, responsive UI with smooth animations
+- Activity logging for security-related events
+- SMTP email notifications for verification, lockout, and login events
+- Prisma migrations for repeatable database setup
+- Vercel-ready deployment with Neon PostgreSQL
 
-## Features
+## Authentication flow
 
-- User Registration: OTP-based email verification before account activation
-- User Login: Optional 2FA using TOTP for an additional layer of security
-- Password Reset: Strength validation and confirmation matching
-- Account Deletion: Requires password or 2FA confirmation, with email notification
-- Bot Protection: Google reCAPTCHA v2 on key forms
-- Password Strength Meter: Real-time visual feedback while creating a password
-- Activity Log: Records login, logout, and other security-related events
-- Account Lockout: Locks an account after five failed login attempts, with a fifteen-minute cooldown
-- UI Enhancements: Password visibility toggle and real-time toast notifications
-- Responsive Design: Dark-themed UI with glassmorphism elements and animated backgrounds
+### Registration
 
-## Technologies Used
+1. Enter a username, email address, and password.
+2. Request an email OTP.
+3. Verify the OTP sent to the email address.
+4. Complete the CAPTCHA challenge.
+5. Create the account.
 
-### Frontend
+### Login
 
-- Next.js 14 (App Router)
-- React
+1. Sign in with a username or email address.
+2. Complete the CAPTCHA challenge.
+3. If enabled, enter the six-digit TOTP code.
+4. Continue to the account area.
+
+Failed login attempts are tracked. Five consecutive failed attempts temporarily lock the account for five minutes.
+
+## Technology stack
+
+### Application
+
+- Next.js 15 with the App Router
+- React 19
 - Tailwind CSS
-- Lucide React for icons
-- react-hot-toast for notifications
-- react-google-recaptcha for bot protection
+- Geist font through `next/font`
+- Vanta and Three.js background effects
+- `react-hot-toast` notifications
+- `react-google-recaptcha`
 
-### Backend
+### Backend and data
 
 - Node.js
 - Prisma ORM
-- SQLite (with support for PostgreSQL or MySQL)
+- PostgreSQL
+- Neon recommended for hosted deployments
+- Prisma migrations for schema management
 
-### Security
+### Security and messaging
 
-- bcryptjs for password hashing
-- speakeasy for TOTP-based 2FA
-- Nodemailer for email notifications via SMTP (Gmail)
-- qrcode for generating 2FA setup QR codes
+- `bcryptjs` for password hashing
+- `speakeasy` for TOTP generation and verification
+- `qrcode` for 2FA setup
+- `jsonwebtoken` for signed tokens
+- Nodemailer for SMTP email delivery
+- Google reCAPTCHA for bot protection
 
-## Utilities
+## Requirements
 
-- date-fns for date manipulation
-- PostCSS and Autoprefixer for CSS processing
+- Node.js 18 or newer
+- npm 9 or newer
+- A PostgreSQL database
+- A Google reCAPTCHA site key and secret key
+- An SMTP account for sending email
 
-## Getting Started
+Neon is recommended for PostgreSQL because it works well with Vercel serverless deployments.
 
-Follow these steps to set up and run Secure Portal locally.
+## Local setup
 
-### Prerequisites
+### 1. Install dependencies
 
-- Node.js v18 or higher
-- npm v9 or higher
-- A Gmail account for sending emails via Nodemailer (an App Password is required)
-- A Google reCAPTCHA v2 site key and secret key
+```powershell
+cd secure-portal
+npm install
+```
 
-### Installation
+### 2. Configure environment variables
 
-1. Navigate to the project directory:
+Create `secure-portal/.env` using `.env.example` as a template:
 
-   ```bash
-   cd secure-portal
-   ```
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
+DIRECT_URL="postgresql://USER:PASSWORD@DIRECT_HOST/DATABASE?sslmode=require"
 
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Initialize Prisma and set up the database:
-
-   ```bash
-   npx prisma init
-   npx prisma migrate dev --name init
-   npx prisma generate
-   ```
-
-### Environment Configuration
-
-Create a `.env` file in the root directory with the following variables:
-
-```bash
-DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
 RECAPTCHA_SITE_KEY=your-recaptcha-site-key
 RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
-EMAIL_USER=your-gmail-address@gmail.com
-EMAIL_PASS=your-gmail-app-password
-EMAIL_FROM="Secure Portal <your-gmail-address@gmail.com>"
+
+EMAIL_USER=your-email@example.com
+EMAIL_PASS=your-smtp-app-password
+EMAIL_FROM="Secure Portal <your-email@example.com>"
 EMAIL_SERVER_HOST=smtp.gmail.com
 EMAIL_SERVER_PORT=465
 EMAIL_SECURE=true
-JWT_SECRET=your-32-character-jwt-secret
+
+JWT_SECRET=replace-with-a-long-random-secret
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Replace each placeholder with your actual values.
+Use a pooled Neon connection for `DATABASE_URL` and a direct Neon connection for `DIRECT_URL` when both are available. Never commit `.env` or place real credentials in `.env.example`.
 
-For Vercel, add these variables in the project settings instead of committing `.env`. Set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS URL. Copy `.env.example` as a starting point, and use a newly generated `JWT_SECRET`.
+### 3. Generate Prisma Client and apply migrations
 
-### Running the Application
-
-1. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-2. View the database in real time using Prisma Studio:
-
-   ```bash
-   npx prisma studio
-   ```
-
-3. Open the application in your browser at [http://localhost:3000](http://localhost:3000)
-
-## Project Structure
-
-```
-secure-portal/
-├── app/              # Next.js App Router pages and API routes
-├── components/       # Reusable React components
-├── lib/              # Utility functions and configurations
-├── prisma/           # Prisma schema and migrations
-├── public/           # Static assets (images, fonts, etc.)
-├── styles/           # Global CSS and Tailwind configuration
-├── .env              # Environment variables
-├── package.json      # Project dependencies and scripts
-└── readme.md         # Project documentation
-```
-
-## Security Features
-
-- Password Hashing: All passwords are hashed using bcryptjs before storage
-- Two-Factor Authentication: TOTP-based 2FA via speakeasy
-- OTP Email Verification: Required during registration to confirm ownership of the email address
-- Google reCAPTCHA v2: Protects key forms from automated bot submissions
-- Account Lockout: Five failed login attempts trigger a fifteen-minute lockout period
-- JWT Authentication: Secures API routes with signed tokens
-- Activity Logging: Records key user actions, such as logins and security changes, in the database
-
-## NPM Packages
-
-### Runtime and Framework
-
-```bash
-npm install next
-npm install react
-npm install react-dom
-```
-
-### Styling and UI
-
-```bash
-npm install tailwindcss
-npm install postcss
-npm install autoprefixer
-npm install three
-npm install vanta
-npm install lucide-react
-npm install react-hot-toast
-npm install react-google-recaptcha
-```
-
-### Database and ORM
-
-```bash
-npm install @prisma/client
-npm install prisma --save-dev
-```
-
-### Authentication and Security
-
-```bash
-npm install bcryptjs
-npm install speakeasy
-npm install nodemailer
-npm install date-fns
-npm install qrcode
-npm install jwt-decode
-```
-
-## NPX Commands
-
-### Initialize Prisma
-
-```bash
-npx prisma init
-```
-
-### Apply Migrations
-
-```bash
-npx prisma migrate dev --name init
-```
-
-### Generate Prisma Client
-
-```bash
+```powershell
 npx prisma generate
+npx prisma migrate deploy
 ```
 
-## Development Notes
+The repository already contains the required migrations. `migrate deploy` applies them to the configured PostgreSQL database without creating development-only migration files.
 
-This project was built through a vibe coding approach: solutions and code were generated step by step, then manually copy-pasted, tested, and debugged rather than applied by an automated agent. Configuring the security layer, including 2FA, OTP verification, and reCAPTCHA, involved hands-on research and iteration to get each piece working correctly together.
+### 4. Start the application
+
+```powershell
+npm run dev
+```
+
+Open:
+
+- [http://localhost:3000/login](http://localhost:3000/login)
+- [http://localhost:3000/register](http://localhost:3000/register)
+
+To inspect the database locally:
+
+```powershell
+npx prisma studio
+```
+
+## Available scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server with Turbopack |
+| `npm run build` | Generate Prisma Client, apply migrations, and build Next.js |
+| `npm run start` | Start the production server |
+| `npm run lint` | Run Next.js ESLint checks |
+| `npm run db:setup` | Generate Prisma Client and apply migrations |
+| `npm run test:services` | Run the service test script |
+
+## Project structure
+
+```text
+secure-portal/
+├── app/
+│   ├── account/             # Authenticated account experience
+│   ├── api/                 # Authentication, OTP, email, and 2FA routes
+│   ├── forgot-password/    # Password recovery UI
+│   ├── login/              # Login and 2FA interface
+│   ├── register/           # Registration and email OTP interface
+│   ├── globals.css         # Global styles and authentication UI system
+│   └── layout.js           # Root layout and font configuration
+├── lib/                    # Prisma, mailer, activity, and Vanta helpers
+├── prisma/
+│   ├── migrations/         # PostgreSQL schema migrations
+│   └── schema.prisma       # Prisma data model
+├── public/                 # Static assets
+├── scripts/                # Service and setup scripts
+├── .env.example            # Safe environment variable template
+├── next.config.mjs         # Next.js configuration
+└── package.json            # Dependencies and project scripts
+```
+
+## Security model
+
+- Passwords are stored as bcrypt hashes, never as plaintext.
+- Registration requires email OTP verification.
+- Login is protected by Google reCAPTCHA.
+- Optional TOTP 2FA adds a second authentication factor.
+- Failed login attempts are counted and temporary lockout is enforced.
+- Login and security events are written to the activity log.
+- Email notifications are sent for important account events.
+- Secrets are loaded from environment variables.
+- Database schema changes are managed through Prisma migrations.
+
+## Deploy to Vercel with Neon
+
+### 1. Create a Neon project
+
+Create a project in the [Neon Console](https://console.neon.tech/) and copy the PostgreSQL connection strings.
+
+Use:
+
+- Pooled connection as `DATABASE_URL`
+- Direct connection as `DIRECT_URL`
+
+### 2. Configure Vercel environment variables
+
+In Vercel, open **Settings → Environment Variables** and add the variables from the environment configuration section. Configure them for the environments you use:
+
+- Production
+- Preview
+- Development
+
+Set `NEXT_PUBLIC_APP_URL` to the deployed HTTPS URL.
+
+### 3. Deploy
+
+Set the Vercel project root to `secure-portal` if the repository contains this folder as a subdirectory. The build script already runs:
+
+```text
+prisma generate && prisma migrate deploy && next build
+```
+
+After adding or changing environment variables, redeploy the project.
+
+## Environment and secret hygiene
+
+- Never commit `.env`.
+- Never paste database passwords, SMTP passwords, CAPTCHA secrets, or JWT secrets into source control.
+- Rotate credentials immediately if they are exposed.
+- Use a long, randomly generated `JWT_SECRET`.
+- Use a Gmail App Password or another SMTP credential rather than a personal email password.
+- Use separate credentials for development and production where possible.
+
+## License
+
+This project is intended for learning, prototyping, and portfolio use. Add a project-specific license before distributing it publicly.
